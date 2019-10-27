@@ -1,0 +1,13 @@
+*.bin
+*.lst
+*.elf
+*.map
+*.mif
+*.mem
+*.hex
+*.o
+*.d
+*.lis
+
+tools/bin2mif/bin2mif
+tools/bin2c/bin2c

@@ -1,0 +1,11 @@
+ADDRESS_SPACE progmem COMBINED [0x00000000:0x000001FFF]
+  ADDRESS_RANGE RAMB16
+    BUS_BLOCK
+      pano_top/memory/Mram_mem3 [31:24]  PLACED=X1Y7 OUTPUT = ram_mem3.mem;
+      pano_top/memory/Mram_mem2 [23:16]  PLACED=X1Y8 OUTPUT = ram_mem2.mem;
+      pano_top/memory/Mram_mem1 [15:8]  PLACED=X1Y6 OUTPUT = ram_mem1.mem;
+      pano_top/memory/Mram_mem0 [7:0]  PLACED=X1Y4 OUTPUT = ram_mem0.mem;
+    END_BUS_BLOCK;
+  END_ADDRESS_RANGE;
+END_ADDRESS_SPACE;
+
