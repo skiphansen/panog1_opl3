@@ -68,28 +68,37 @@ module calc_phase_inc (
     wire signed [`REG_FNUM_WIDTH-1:0] vib_val;
     
     assign pre_mult = fnum << block;
-    
+
+    reg signed [4:0] pre_mult_adj;
+    always @(*) begin
+        case (mult)
+        'h0: pre_mult_adj <= 1;
+        'h1: pre_mult_adj <= 1;
+        'h2: pre_mult_adj <= 2;
+        'h3: pre_mult_adj <= 3;
+        'h4: pre_mult_adj <= 4;
+        'h5: pre_mult_adj <= 5;
+        'h6: pre_mult_adj <= 6;
+        'h7: pre_mult_adj <= 7;
+        'h8: pre_mult_adj <= 8;
+        'h9: pre_mult_adj <= 9;
+        'hA: pre_mult_adj <= 10;
+        'hB: pre_mult_adj <= 10;
+        'hC: pre_mult_adj <= 12;
+        'hD: pre_mult_adj <= 12;
+        'hE: pre_mult_adj <= 15;
+        'hF: pre_mult_adj <= 15;
+        default: pre_mult_adj <= 1;
+        endcase
+    end
+
     always @(posedge clk)
         if (reset)
             post_mult <= 0;
         else
             case (mult)
             'h0: post_mult <= pre_mult >> 1;
-            'h1: post_mult <= pre_mult;
-            'h2: post_mult <= pre_mult*2;
-            'h3: post_mult <= pre_mult*3;
-            'h4: post_mult <= pre_mult*4;
-            'h5: post_mult <= pre_mult*5;
-            'h6: post_mult <= pre_mult*6;
-            'h7: post_mult <= pre_mult*7;
-            'h8: post_mult <= pre_mult*8;
-            'h9: post_mult <= pre_mult*9;
-            'hA: post_mult <= pre_mult*10;
-            'hB: post_mult <= pre_mult*10;
-            'hC: post_mult <= pre_mult*12;
-            'hD: post_mult <= pre_mult*12;
-            'hE: post_mult <= pre_mult*15;
-            'hF: post_mult <= pre_mult*15;
+            default: post_mult <= pre_mult * pre_mult_adj;
             endcase
     
     always @ *
