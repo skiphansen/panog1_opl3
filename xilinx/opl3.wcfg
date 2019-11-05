@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/skip/pano/working/panog1_opl3/xilinx/opl3_isim.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="test" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="25" />
+   <wave_markers>
+      <marker time="41165000000" label="" />
+   </wave_markers>
+   <wvobject fp_name="/test/DUT/opl2/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/OPL2_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">OPL2_clk</obj_property>
+      <obj_property name="ObjectShortName">OPL2_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/PB" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">PB</obj_property>
+      <obj_property name="ObjectShortName">PB</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/tb_reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">tb_reset</obj_property>
+      <obj_property name="ObjectShortName">tb_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/cpu/resetn" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/rst_counter" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">rst_counter[3:0]</obj_property>
+      <obj_property name="ObjectShortName">rst_counter[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/mem_addr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">mem_addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_addr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/mem_rdata" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">mem_rdata[31:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_rdata[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/opl2_we" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">opl2_we</obj_property>
+      <obj_property name="ObjectShortName">opl2_we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/opl2_adr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl2_adr[7:0]</obj_property>
+      <obj_property name="ObjectShortName">opl2_adr[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/opl2_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl2_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">opl2_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/reset" type="logic" db_ref_id="1">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+      <obj_property name="label">opl2_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/channel_a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_a[15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_a[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2_channel_a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl2_channel_a[15:0]</obj_property>
+      <obj_property name="ObjectShortName">opl2_channel_a[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2_channel_b" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl2_channel_b[15:0]</obj_property>
+      <obj_property name="ObjectShortName">opl2_channel_b[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/clk25" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk25</obj_property>
+      <obj_property name="ObjectShortName">clk25</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/audio_bclk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">audio_bclk</obj_property>
+      <obj_property name="ObjectShortName">audio_bclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/last_bclk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">last_bclk</obj_property>
+      <obj_property name="ObjectShortName">last_bclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/sample_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sample_clk</obj_property>
+      <obj_property name="ObjectShortName">sample_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/audio_daclrc" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">audio_daclrc</obj_property>
+      <obj_property name="ObjectShortName">audio_daclrc</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl2/cntr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cntr[8:0]</obj_property>
+      <obj_property name="ObjectShortName">cntr[8:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/bit_cntr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">bit_cntr[5:0]</obj_property>
+      <obj_property name="ObjectShortName">bit_cntr[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/last_audio_sample_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">last_audio_sample_clk</obj_property>
+      <obj_property name="ObjectShortName">last_audio_sample_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/audio_dacdat" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">audio_dacdat</obj_property>
+      <obj_property name="ObjectShortName">audio_dacdat</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/codec_interface/start_cycle" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">start_cycle</obj_property>
+      <obj_property name="ObjectShortName">start_cycle</obj_property>
+   </wvobject>
+</wave_config>

@@ -43,6 +43,7 @@
 #
 # Converted from systemVerilog to Verilog and reduced to the OPL2 subset
 # Copyright (C) 2018 Magnus Karlsson <magnus@saanlima.com>
+# Additional tweaks for Spartan 3 tools Skip Hansen 2019
 #
 *******************************************************************************/
 
@@ -58,7 +59,8 @@ module opl2(
   kon,       // key on
   channel_a, // output channel a
   channel_b, // output channel b
-  sample_clk
+  sample_clk,
+  sample_clk_128   // 128 X sample rate clock
   );
 
   input         clk;
@@ -71,6 +73,7 @@ module opl2(
   output signed [15:0] channel_a;
   output signed [15:0] channel_b;
   output sample_clk;
+  output sample_clk_128;
 
   localparam OPERATOR_PIPELINE_DELAY = 7; 
   // 18 operators + idle state
@@ -107,6 +110,7 @@ module opl2(
   reg [8:0] kon;
   reg [2:0] block[8:0];
   reg sample_clk;
+  reg sample_clk_128;
 
   reg dam;
   reg dvb;
@@ -177,10 +181,14 @@ module opl2(
       sample_clk_en <= 1'b0;
       sample_clk <= 1'b0;
     end else begin
-      // 25 MHz clock (25 MHz/503 = 49702 Hz)
-      cntr <= cntr == 9'd502 ? 9'd0 : cntr + 1'b1;
+    // Note: A "real" opl3 generates the sampling clock by dividing 14.318MHz
+    // by 288 for sampling rate of 49715.2777..
+    // 25 MHz clock (25 MHz/503 = 49702 Hz)
+//    cntr <= cntr == 9'd502 ? 9'd0 : cntr + 1'b1;
+      cntr <= cntr == 9'd499 ? 9'd0 : cntr + 1'b1;
       sample_clk_en <= cntr == 9'd0;
-      sample_clk <= cntr[8];
+      sample_clk <= ~cntr[8];
+      sample_clk_128 <= ~cntr[0];
     end
 
   /*

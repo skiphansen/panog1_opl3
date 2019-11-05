@@ -43,6 +43,7 @@
 
 #define DLY_TAP_ADR        0x03000000
 #define LEDS_ADR           0x03000004
+#define OPL3_OUTPUT_ADR    0x03000008
 #define SPI_CSN_ADR        0x0300000C
 #define SPI_CLK_ADR        0x03000010
 #define SPI_DO_ADR         0x03000014
@@ -54,6 +55,10 @@
 #define USB_RST_ADR        0x0300001c
 #define CODEC_I2C_ADR      0x03000020
 #define VGA_I2C_ADR        0x03000028
+#define OPL3_STATUS_ADR    0x03000030
+
+#define OPL3_STATUS_RDY    0x00000001
+#define OPL3_STATUS_OVFL   0x00000002
 
 #define UART_ADR           0x03000100
 #define OPL3_ADR           0x03000400
@@ -65,8 +70,9 @@
 // For VRAM, only the lowest byte in each 32bit word is used
 #define VRAM               ((volatile uint32_t *)VRAM_ADR)
 #define DDR                ((volatile uint32_t *)DDR_ADR)
-#define DLY_TAP           *((volatile uint32_t *)DLY_TAP_ADR)
-#define LEDS              *((volatile uint32_t *)LEDS_ADR)
+#define DLY_TAP            *((volatile uint32_t *)DLY_TAP_ADR)
+#define LEDS               *((volatile uint32_t *)LEDS_ADR)
+#define OPL3_OUTPUT        *((volatile uint32_t *)OPL3_OUTPUT_ADR)
 
 #define SPI_CSN            *((volatile uint32_t *)SPI_CSN_ADR)
 #define SPI_CLK            *((volatile uint32_t *)SPI_CLK_ADR)
@@ -74,6 +80,7 @@
 #define SPI_DI             *((volatile uint32_t *)SPI_DI_ADR)
 #define DEBUG_UART         *((volatile uint32_t *)UART_ADR)
 #define USB_RST            *((volatile uint32_t *)USB_RST_ADR)
+#define OPL3_STATUS        *((volatile uint32_t *)OPL3_STATUS_ADR)
 
 #define OPL3               *((volatile uint8_t *)OPL3_ADR)
 

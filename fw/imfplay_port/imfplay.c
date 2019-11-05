@@ -47,14 +47,15 @@ subject to the following restrictions:
 #else
 #include "pano_io.h"
 #include "pano_time.h"
-#define TimerDelay(x)   delay_us(x)
+void TimerDelay(uint32_t x);
 #define XUartPs_IsReceiveData(x)  0
 #define XPAR_OPL3_FPGA_0_S_AXI_BASEADDR   0
 #define XPAR_PS7_UART_1_BASEADDR          0
 void Opl3WriteReg(uint8_t chip,uint8_t RegOffset,uint8_t Data);
 
-#define DEBUG_LOGGING
-#define VERBOSE_DEBUG_LOGGING
+// #define DEBUG_LOGGING
+// #define VERBOSE_DEBUG_LOGGING
+// #define LOG_TO_BOTH
 #include "log.h"
 
 #endif
@@ -108,7 +109,7 @@ void opl2_out(unsigned char reg, unsigned char data, unsigned char bank)
       char char_array[4];
    } actual_data;
 
-   VLOG("called\n");
+   VLOG("bank %d, reg 0x%02x, data 0x%02x\n",bank,reg,data);
 
    /*
     * Write 8-bit value using 32-bit read/modify/write. Only 32-bit
@@ -117,9 +118,11 @@ void opl2_out(unsigned char reg, unsigned char data, unsigned char bank)
 #if 0
    actual_data.int_value = OPL3_FPGA_mReadReg(XPAR_OPL3_FPGA_0_S_AXI_BASEADDR, actual_reg);
    actual_data.char_array[reg%4] = data;
+   OPL3_FPGA_mWriteReg(XPAR_OPL3_FPGA_0_S_AXI_BASEADDR, actual_reg, actual_data.int_value);
+#else
+   Opl3WriteReg(0,reg,data);
 #endif
 
-   OPL3_FPGA_mWriteReg(XPAR_OPL3_FPGA_0_S_AXI_BASEADDR, actual_reg, actual_data.int_value);
    shadow_opl[reg] = data;
 }
 
@@ -311,7 +314,7 @@ int file_open(fileinfo *fi, char *fname)
 
             if (rb[9] != 0 || rb[10] != 0)
             {
-               puts("unsupported DRO 2.0 flags!");
+               ELOG("unsupported DRO 2.0 flags!\n");
                return 0;
             }
 
@@ -327,7 +330,7 @@ int file_open(fileinfo *fi, char *fname)
          }
          else
          {
-            puts("unsupported DRO version!");
+            ELOG("unsupported DRO version!\n");
             return 0;
          }
       }
@@ -360,6 +363,7 @@ int imfplay(char *filename)
    VLOG("called\n");
 
    // unmute output
+   VLOG("calling opl2_out(2, 1, 1)\n");
    opl2_out(2, 1, 1);
 
    file_open(&f, filename);
@@ -398,21 +402,23 @@ int imfplay(char *filename)
    switch(f.type)
    {
       case FT_IMF0:
-         puts("IMF type 0 file");
+         LOG("IMF type 0 file\n");
          break;
       case FT_IMF1:
-         puts("IMF type 1 file");
+         LOG("IMF type 1 file\n");
          break;
       case FT_DRO1:
-         puts("DRO 1.0 file");
+         LOG("DRO 1.0 file\n");
          break;
       case FT_DRO2:
-         puts("DRO 2.0 file");
+         LOG("DRO 2.0 file\n");
          break;
    }
 
    //clear OPL2
+   LOG_DISABLE();
    opl2_clear();
+   LOG_ENABLE();
 
    //play
    {

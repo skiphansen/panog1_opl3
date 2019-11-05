@@ -1,16 +1,16 @@
 
 module audio(
     input wire  clk25,
-    input wire  reset25_,
+    input wire  reset25,
 
-    output wire audio_mclk,
-    output wire audio_bclk,
+    input wire audio_bclk,
     output reg  audio_dacdat,
     output reg  audio_daclrc,
     input  wire audio_adcdat,
     output reg  audio_adclrc,
     input  wire [15:0] audio_right_sample,
-    input  wire [15:0] audio_left_sample
+    input  wire [15:0] audio_left_sample,
+    input  wire audio_sample_clk
     );
 
 // Mclk = 25.00 Mhz 
@@ -24,52 +24,56 @@ module audio(
 //          (0<<2) |    // WL     : 16 bits
 //          (3<<0) },   // FORMAT : DSP mode
 
-    assign audio_mclk = clk25;
 
-    // In USB mode, BCLK = MCLK
-    assign audio_bclk = clk25;
+// There are 503 25 Mhz clocks per sample for a sampling rate 49701.79 hz.
+// We need 250 bclk cycles during this time for the Codec.
+// bclk is clk25 / 2 so each bclk each bclk is 2 clocks except the high
+// period is 4 cycles
+// 
 
-    reg signed [15:0] sample_left, sample_right;
-    reg [31:0] sample;
-    reg [8:0]  bit_cntr, bit_cntr_nxt;
-    reg [15:0] phase_cntr, phase_cntr_nxt;
-    reg audio_daclrc_nxt, audio_dacdat_nxt;
-    reg audio_adclrc_nxt;
 
-    //localparam max_bit_cntr = 12288/48;     // 48KHz
-    localparam max_bit_cntr = 255;
-    
-    always @*
-    begin
-        bit_cntr_nxt    = bit_cntr;
-        phase_cntr_nxt  = phase_cntr;
-        if (bit_cntr_nxt == 0) begin
-            sample_left  = audio_left_sample;
-            sample_right = audio_right_sample;
-            sample = { sample_left, sample_right };
-        end
-        bit_cntr_nxt    = bit_cntr + 1;
-
-        audio_daclrc_nxt    = (bit_cntr == 0);
-        audio_dacdat_nxt    = |bit_cntr[8:5] ? 1'b0 : sample[~bit_cntr[4:0]];
-
-        audio_adclrc_nxt   = (bit_cntr == 0);
-    end
+    reg [5:0]  bit_cntr;
+    reg last_audio_sample_clk;
+    reg start_cycle;
+    reg last_bclk;
 
     always @(posedge clk25) 
     begin
-        bit_cntr        <= bit_cntr_nxt;
-        phase_cntr      <= phase_cntr_nxt;
-        audio_daclrc    <= audio_daclrc_nxt;
-        audio_dacdat    <= audio_dacdat_nxt;
-        audio_adclrc    <= audio_adclrc_nxt;
+        last_bclk <= audio_bclk;
+        if (last_audio_sample_clk != audio_sample_clk) begin
+            last_audio_sample_clk <= audio_sample_clk;
+        // rising edge of sample clock, start new cycle
+            if (audio_sample_clk) begin
+                start_cycle <= 1;
+            end
+        end
 
-        if (!reset25_) begin
-            bit_cntr        <= 0;
-            phase_cntr      <= 0;
-            audio_daclrc    <= 1'b0;
-            audio_dacdat    <= 1'b0;
-            audio_adclrc    <= 1'b0;
+        if(audio_bclk && !last_bclk) begin
+        end
+        else if(!audio_bclk && last_bclk) begin
+            audio_daclrc    <= 0;
+            if(start_cycle) begin
+                start_cycle <= 0;
+                bit_cntr     <= 1;
+                audio_daclrc <= 1;
+                audio_dacdat <= audio_left_sample[15];
+            end
+            else if (bit_cntr < 16) begin
+                bit_cntr <= bit_cntr + 1;
+                audio_dacdat <= audio_left_sample[~bit_cntr[3:0]];
+            end
+            else if (bit_cntr < 32) begin
+                bit_cntr <= bit_cntr + 1;
+                audio_dacdat <= audio_right_sample[~bit_cntr[3:0]];
+            end
+        end
+
+        if (reset25) begin
+            bit_cntr        <= 6'd32;
+            audio_adclrc    <= 0;
+            last_audio_sample_clk <= 0;
+            start_cycle <= 0;
+            last_bclk <= 0;
         end
     end
 

@@ -7,8 +7,8 @@ all: picorv_bl.mif picorv_bl.lst
 
 -include $(TOPDIR)/Makefile
 
-picorv_bl.elf: sections_bl.lds start_bl.s bootloader.c
-	$(TOOLCHAIN_PREFIX)gcc $(CFLAGS) -Wl,-Bstatic,-T,sections_bl.lds,-Map=picorv_bl.map,--strip-debug -Wl,--no-relax -o picorv_bl.elf start_bl.s bootloader.c
+picorv_bl.elf: sections_bl.lds start_bl.s opl3_tb.c
+	$(TOOLCHAIN_PREFIX)gcc $(CFLAGS) -Wl,-Bstatic,-T,sections_bl.lds,-Map=picorv_bl.map,--strip-debug -Wl,--no-relax -o picorv_bl.elf start_bl.s opl3_tb.c
 	size picorv_bl.elf
 
 picorv_bl.bin: picorv_bl.elf

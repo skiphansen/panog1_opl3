@@ -35,7 +35,7 @@ uint32_t ticks_ms() {
 
 void delay_us(uint32_t us) {
     uint32_t start = ticks(); 
-    while (ticks() - start < CYCLE_PER_US * us);
+    while ((ticks() - start) < (CYCLE_PER_US * us));
 }
 
 void delay_ms(uint32_t ms) {

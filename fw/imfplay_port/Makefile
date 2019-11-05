@@ -2,8 +2,27 @@ TOPDIR := ../..
 
 MAIN_PRG := imfplay
 
-# Test file 
-DRO_FILE = opl3dro/doom_000.dro
+# Test file
+#DRO_FILE = opl3dro/doom_000.dro
+#DRO_FILE = opl3dro/doom_035.dro
+#DRO_FILE = opl3dro/doom_036.dro
+
+#DRO_FILE = opl3dro/doom2_000.dro
+#DRO_FILE = opl3dro/doom2_001.dro
+#DRO_FILE = opl3dro/doom2_002.dro
+#DRO_FILE = opl3dro/doom2_003.dro
+#DRO_FILE = opl3dro/doom2_013.dro
+#DRO_FILE = opl3dro/doom2_014.dro
+#DRO_FILE = opl3dro/doom2_015.dro
+#DRO_FILE = opl3dro/doom2_016.dro
+#DRO_FILE = opl3dro/doom2_031.dro
+DRO_FILE = opl3dro/doom2_032.dro
+
+# these don't work (opl3 support needed?)
+#DRO_FILE = opl3dro/war_000.dro
+#DRO_FILE = opl3dro/atlantis_000.dro
+#DRO_FILE = opl3dro/dott_000.dro
+#DRO_FILE = opl3dro/xcom_001.dro
 
 CFLAGS = -I../include -MD -O1 -march=rv32i -ffreestanding -nostdlib 
 VPATH = ../common
@@ -39,7 +58,7 @@ $(MAIN_PRG).elf: $(OBJS) sections.lds
 %.o: %.s
 	$(TOOLCHAIN_PREFIX)gcc -c $(CFLAGS) $<
 
-mfs_file.h: $(BIN2C) 
+mfs_file.h: $(BIN2C) Makefile
 	$(BIN2C) $(DRO_FILE) mfs_file.h gMfsFile
 
 mfs_filesys.o: mfs_file.h

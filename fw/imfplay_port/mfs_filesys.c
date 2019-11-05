@@ -7,8 +7,9 @@
 #include <stdint.h>
 #include <string.h>
 #include "xilmfs.h"
-#define DEBUG_LOGGING
-#define VERBOSE_DEBUG_LOGGING
+// #define DEBUG_LOGGING
+// #define VERBOSE_DEBUG_LOGGING
+// #define LOG_TO_BOTH
 #include "log.h"
 
 #include "mfs_file.h"

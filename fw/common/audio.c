@@ -4,12 +4,12 @@
 #include "audio.h"
 
 #include "i2c.h"
+#define DEBUG_LOGGING
+#include "log.h"
 
+// Sampling rate for opl3 is 49715.2777, the FPGA implementation is
+// 25 MHz/503 = 49.702 kHz
 short int audio_registers[][2] = {
-    // For now, use default volume settings for LOUT1/ROUT1
-//    { WM8750_LOUT1_VOL_ADDR,            -1 },
-//    { WM8750_ROUT1_VOL_ADDR,            -1 },
-
     { WM8750_LOUT1_VOL_ADDR,            (0<<8) |    // LO2VU    : Don't update LOUT1 volume yet
                                         (0<<7) |    // LO2ZC    : Change gain on zero cross only
                                      (0x78<<0) },   // LOUT2VOL : Volume...
@@ -21,7 +21,7 @@ short int audio_registers[][2] = {
 
     // Disable digital soft mute, no de-emphasis
     { WM8750_ADC_DAC_CTRL_ADDR,         (0<<3) |    // DACMU: Disable digital soft mute
-                                        (3<<1) },   // DEEMP: 48 Khz sampling rate
+                                        (0<<1) },   // DEEMP: no de-emphasis
 
     // DSP Mode, mode B, LRP=1, Slave (Figure 23), 16 bits
     { WM8750_AUDIO_INTFC_ADDR,          (0<<7) |    // BCLKINV: BCLK not inverted
@@ -31,11 +31,11 @@ short int audio_registers[][2] = {
                                         (0<<2) |    // WL     : 16 bits
                                         (3<<0) },   // FORMAT : DSP mode
 
-    // MCLK 25 MHz, 48kHz sample rate
+    // MCLK 25 MHz, around a 48kHz sample rate
     { WM8750_SAMPLE_RATE_ADDR,          (0<<7) |    // BCM    : Bit Clock Mode disabled
-                                        (1<<6) |    // CLKDIV2: MCLK divided by 2
+                                        (0<<6) |    // CLKDIV2: MCLK divided by 2
                                         (0<<1) |    // SR     : ADC and DAC 48kHz
-                                        (0<<0) },   // USB    : 12MHz Normal clock mode 
+                                        (1<<0) },   // USB    : USB clock mode 
     // Set left and right channel volume
     { WM8750_LCHAN_VOL_ADDR,            (0<<8) |    // LDVU   : No left DAC volume update
                                         (0xff) },   // LDACVOL: Set to 0 db
@@ -84,10 +84,8 @@ short int audio_registers[][2] = {
 
     { WM8750_PWR_MANAGEMENT2_ADDR,      (1<<8) |    // DACL : DAC Left
                                         (1<<7) |    // DACR : DAC Right
-//                                        (0<<6) |    // LOUT1: Disable for now
-//                                        (0<<5) |    // ROUT1: Disable for now
-                                        (1<<6) |    // LOUT1: Disable for now
-                                        (1<<5) |    // ROUT1: Disable for now
+                                        (1<<6) |    // LOUT1: Enabled
+                                        (1<<5) |    // ROUT1: Enabled
                                         (1<<4) |    // LOUT2: Speaker is on
                                         (1<<3) |    // ROUT2: Speaker is on
                                         (0<<2) |    // MONO : Mono output is not used
@@ -139,6 +137,7 @@ short int audio_registers[][2] = {
 
 void audio_init()
 {
+//    i2c_test(CODEC_I2C_ADR);
     i2c_init(CODEC_I2C_ADR);
 
     int idx = 0;
@@ -146,7 +145,10 @@ void audio_init()
         int addr  = audio_registers[idx][0];
         int value = audio_registers[idx][1];
 
-        i2c_write_reg(CODEC_I2C_ADR, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff));
+        if(!i2c_write_reg(CODEC_I2C_ADR, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff))) {
+            ELOG("i2c_write_reg failed\n");
+           break;
+        }
         ++idx;
     }
 }

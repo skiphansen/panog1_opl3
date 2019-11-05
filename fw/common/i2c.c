@@ -2,8 +2,11 @@
 #include "pano_time.h"
 #include "i2c.h"
 
-#define REG_WR(reg, wr_data)       *((volatile uint32_t *)reg) = (wr_data)
-#define REG_RD(reg)                *((volatile uint32_t *)reg)
+#define DEBUG_LOGGING
+#include "log.h"
+
+#define REG_WR(reg, wr_data)       *((volatile uint8_t *)reg) = (wr_data)
+#define REG_RD(reg)                *((volatile uint8_t *)reg)
 
 // Slow I2C devices need 4.7 microseconds ... but the Pano doesn't have
 // any slow devices, but be safe.
@@ -34,6 +37,7 @@ void i2c_init(int Port)
 {
    i2c_set_sda(Port, 1);
    i2c_set_scl(Port, 1);
+   I2C_DLY();
 }
 
 
@@ -132,6 +136,7 @@ int i2c_write_buf(int Port, uint8_t ADR, uint8_t* data, int len)
    ack = i2c_tx(Port, ADR);
    if(!ack) {
       i2c_stop(Port);
+      ELOG("Error: No ack on adr\n");
       return 0;
    }
 
@@ -140,6 +145,7 @@ int i2c_write_buf(int Port, uint8_t ADR, uint8_t* data, int len)
    for(i=0;i<len;++i) {
       ack = i2c_tx(Port, data[i]);
       if(!ack) {
+         ELOG("Error: No data byte %d\n",i);
          i2c_stop(Port);
          return 0;
       }

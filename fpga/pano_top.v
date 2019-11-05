@@ -12,14 +12,6 @@ module pano_top(
     // Global Clock Input
     input wire CLK_OSC,
     
-    // IDT Clock Generator
-    // Not used, DCM is used to generate the clock
-    /*output wire IDT_ICLK,
-    input  wire IDT_CLK1,
-    output wire IDT_SCLK,
-    output wire IDT_STROBE,
-    output wire IDT_DATA,*/
-
     // Power LED
     output wire LED_RED,
     output wire LED_GREEN,
@@ -41,7 +33,7 @@ module pano_top(
     output wire AUDIO_DACLRCK,
     input  wire AUDIO_ADCDATA,
     output wire AUDIO_ADCLRCK,
-    output wire AUDIO_SCL,
+    inout  wire AUDIO_SCL,
     inout  wire AUDIO_SDA,
 
     // LPDDR SDRAM
@@ -87,8 +79,6 @@ module pano_top(
     // Clocking
     wire GND_BIT;
     wire clk_100_in;       // On-board 100M clock source 
-    wire clk_4_raw;        // 4.196MHz for VerilogBoy Core
-    wire clk_4;
     wire clk_12_raw;       // 12MHz for USB controller and codec
     wire clk_12;
     wire clk_24_raw;       // 24MHz for on-board USB hub
@@ -104,11 +94,10 @@ module pano_top(
     wire clk_25;
     wire clk_rv = clk_100;
     wire clk_vga = clk_25;
+    wire dcm_locked_24;
     wire dcm_locked_12;
-    wire dcm_locked_4;
-    wire rst_12 = !dcm_locked_4;
-    wire rst = !dcm_locked_4;
-    reg rst_rv;
+    wire rst_12 = !dcm_locked_12;
+    reg rst_rv_;
     assign GND_BIT = 0;
     
     IBUFG ibufg_clk_100 (
@@ -116,8 +105,8 @@ module pano_top(
         .I(CLK_OSC)
     );
     
+// USB 24 Mhz clock (100 / 25 * 6)
     DCM_SP #(
-        // 100 / 25 * 6 = 24MHz
         .CLKFX_DIVIDE(25),   
         .CLKFX_MULTIPLY(6),
         .CLKIN_DIVIDE_BY_2("FALSE"),          // TRUE/FALSE to enable CLKIN divide by two feature
@@ -130,7 +119,7 @@ module pano_top(
         .DUTY_CYCLE_CORRECTION("TRUE"),       // Duty cycle correction, TRUE or FALSE
         .PHASE_SHIFT(0),                      // Amount of fixed phase shift from -255 to 255
         .STARTUP_WAIT("FALSE")                // Delay configuration DONE until DCM LOCK, TRUE/FALSE
-    ) dcm_12 (
+    ) dcm_24 (
         .CLKIN(clk_100_in),                   // Clock input (from IBUFG, BUFG or DCM)
         .CLK0(clk_100_raw),
         .CLK90(clk_100_90_raw),
@@ -142,7 +131,7 @@ module pano_top(
         .PSEN(1'b0),                          // Dynamic phase adjust enable input
         .PSINCDEC(1'b0),                      // Dynamic phase adjust increment/decrement
         .RST(PB),                             // DCM asynchronous reset input
-        .LOCKED(dcm_locked_12)
+        .LOCKED(dcm_locked_24)
     );
     
     DCM_SP #(
@@ -158,19 +147,18 @@ module pano_top(
         .DUTY_CYCLE_CORRECTION("TRUE"),       // Duty cycle correction, TRUE or FALSE
         .PHASE_SHIFT(0),                      // Amount of fixed phase shift from -255 to 255
         .STARTUP_WAIT("FALSE")                // Delay configuration DONE until DCM LOCK, TRUE/FALSE
-    ) dcm_4 (
+    ) dcm_12 (
         .CLKIN(clk_25_in),                    // Clock input (from IBUFG, BUFG or DCM)
         .CLK0(clk_25_raw),
         .CLKFX(clk_12_raw),                   // DCM CLK synthesis out (M/D)
         .CLKFB(clk_25),                       // DCM clock feedback
-        .CLKDV(clk_4_raw),
+        .CLKDV(),
         .PSCLK(1'b0),                         // Dynamic phase adjust clock input
         .PSEN(1'b0),                          // Dynamic phase adjust enable input
         .PSINCDEC(1'b0),                      // Dynamic phase adjust increment/decrement
-        .RST(PB),                             // DCM asynchronous reset input
-        .LOCKED(dcm_locked_4)
+        .RST(!rst_rv_),                       // DCM asynchronous reset input
+        .LOCKED(dcm_locked_12)
     );
-
 
     assign clk_24 = clk_24_raw;
     assign clk_12 = clk_12_raw;
@@ -195,11 +183,6 @@ module pano_top(
         .I(clk_25_raw)
     );
     
-    BUFG bufg_clk_4 (
-        .O(clk_4),
-        .I(clk_4_raw)
-    );
-    
     wire [3:0] mem_wstrb;
     wire [31:0] mem_addr;
     wire [31:0] mem_wdata;
@@ -216,7 +199,7 @@ module pano_top(
     
     mig_infrastructure_top mig_infrastructure_top(
         .reset_in_n(!PB),
-        .dcm_lock(dcm_locked_12),
+        .dcm_lock(dcm_locked_24),
         .delay_sel_val1_val(delay_sel_val_det),
         .sys_rst_val(sys_rst),
         .sys_rst90_val(sys_rst90),
@@ -331,7 +314,7 @@ module pano_top(
     
     usb_picorv_bridge usb_picorv_bridge(
         .clk(clk_rv),
-        .rst(!rst_rv),
+        .rst(!rst_rv_),
         .sys_addr(usb_addr),
         .sys_rdata(usb_rdata),
         .sys_wdata(usb_wdata),
@@ -410,7 +393,7 @@ module pano_top(
     wire opl3_valid = (mem_valid) && (addr_in_opl3);
     assign ddr_valid = (mem_valid) && (addr_in_ddr);
     assign usb_valid = (mem_valid) && (addr_in_usb);
-    wire general_valid = (mem_valid) && (!mem_ready) && (!addr_in_ddr) && (!addr_in_uart) && (!addr_in_usb) && !opl3_valid;
+    wire general_valid = (mem_valid) && (!mem_ready) && (!addr_in_ddr) && (!addr_in_uart) && (!addr_in_usb);
     
     reg default_ready;
     
@@ -424,11 +407,11 @@ module pano_top(
     reg mem_valid_last;
     always @(posedge clk_rv) begin
         mem_valid_last <= mem_valid;
-        if (mem_valid && !mem_valid_last && !(ram_valid || vram_valid || gpio_valid || usb_valid || uart_valid || ddr_valid))
+        if (mem_valid && !mem_valid_last && !(ram_valid || vram_valid || gpio_valid || usb_valid || uart_valid || ddr_valid || opl3_valid))
             cpu_irq <= 1'b1;
         //else
         //    cpu_irq <= 1'b0;
-        if (!rst_rv)
+        if (!rst_rv_)
             cpu_irq <= 1'b0;
     end
     
@@ -446,11 +429,11 @@ module pano_top(
     always @(posedge clk_rv)
     begin
         if (rst_counter == 4'd15)
-            rst_rv <= 1;
+            rst_rv_ <= 1;
         else
             rst_counter <= rst_counter + 1;
         if (rst_rv_pre) begin
-            rst_rv <= 0;
+            rst_rv_ <= 0;
             rst_counter <= 4'd0;
         end
     end
@@ -467,7 +450,7 @@ module pano_top(
         .LATCHED_IRQ(32'hffffffff)
     ) cpu (
         .clk(clk_rv),
-        .resetn(rst_rv),
+        .resetn(rst_rv_),
         .mem_valid(mem_valid),
         .mem_instr(mem_instr),
         .mem_ready(mem_ready),
@@ -479,20 +462,24 @@ module pano_top(
         .irq({31'b0, cpu_irq})
     );
         
-    wire signed [15:0] audio_left_sample;
-    wire signed [15:0] audio_right_sample;
+    wire signed [15:0] opl2_channel_a;
+    wire signed [15:0] opl2_channel_b;
+    wire opl3_sample_clk;
+    wire audio_bclk;
             
     // OPL2
     opl2 opl2(
-      .clk(clk_100_in),
+      .clk(clk_100),
       .OPL2_clk(clk_25),
-      .reset(rst_rv),
+      .reset(!rst_rv_),
       .opl2_we(opl3_valid),
       .opl2_data(mem_wdata[7:0]),
       .opl2_adr(mem_addr[9:2]),
-      .channel_a(audio_left_sample),
-      .channel_b(audio_right_sample),
-      .kon()
+      .channel_a(opl2_channel_a),
+      .channel_b(opl2_channel_b),
+      .kon(),
+      .sample_clk(opl3_sample_clk),
+      .sample_clk_128(audio_bclk)
     );
 
     // Internal RAM & Boot ROM
@@ -512,7 +499,7 @@ module pano_top(
     
     simple_uart simple_uart(
         .clk(clk_rv),
-        .rst(!rst_rv),
+        .rst(!rst_rv_),
         .wstrb(uart_valid),
         .ready(uart_ready),
         .dat(mem_wdata[7:0]),
@@ -524,17 +511,18 @@ module pano_top(
     // ----------------------------------------------------------------------
     
     // 03000000 (0x0)  - R:  delay_sel_det / W: delay_sel_val
-    // 03000004 (0x1)  - W:  leds (0xb0: red, b1: green, b2: blue)
-    // 03000008 (0x2)  - W:  not used
+    // 03000004 (0x1)  - RW:  leds (0xb0: red, b1: green, b2: blue)
+    // 03000008 (0x2)  - R: Opl3 output
     // 0300000c (0x3)  - W: spi_cs_n
-    // 03000010 (0x4)  - W:  not used
+    // 03000010 (0x4)  - W: spi_clk
     // 03000014 (0x5)  - W: spi_do
     // 03000018 (0x6)  - R: spi_di
     // 0300001c (0x7)  - W:  usb_rst_n
-    // 03000020 (0x8)  - W:  Wolfson i2c_scl
+    // 03000020 (0x8)  - RW: Wolfson i2c_scl
     // 03000024 (0x9)  - RW: Wolfson i2c_sda
     // 03000028 (0xa)  - W:  VGA DDC i2c_scl
     // 0300002c (0xb)  - RW: VGA DDC i2c_sda
+    // 03000030 (0xc)  - R: Opl3 status
     
     reg [31:0] gpio_rdata;
     reg led_green;
@@ -549,8 +537,21 @@ module pano_top(
     reg codec_i2c_sda;
     reg vga_i2c_scl;
     reg vga_i2c_sda;
+    reg opl3_data_rdy;
+    reg opl3_data_ovfl;
+    reg opl3_last_sample_clk;
     
     always@(posedge clk_rv) begin
+        if (opl3_last_sample_clk != opl3_sample_clk) begin
+            opl3_last_sample_clk <= opl3_sample_clk;
+            if (opl3_sample_clk) begin
+                if(opl3_data_rdy) begin
+                    opl3_data_ovfl <= 1;
+                 end
+                 opl3_data_rdy <= 1;
+            end
+        end
+
         if (gpio_valid)
              if (mem_wstrb != 0) begin
                 case (mem_addr[5:2])
@@ -574,16 +575,26 @@ module pano_top(
                 case (mem_addr[5:2])
                     4'd0: gpio_rdata <= {27'd0, delay_sel_val};
                     4'd1: gpio_rdata <= {29'd0, led_blue, led_green, led_red};
+                    4'd2: begin
+                        gpio_rdata <= {opl2_channel_a, opl2_channel_b};
+                        opl3_data_rdy <= 0;
+                        opl3_data_ovfl <= 0;
+                    end
                     4'd6: gpio_rdata <= {31'd0, spi_di};
-                    3'd9: gpio_rdata <= {31'd0, AUDIO_SDA};
-                    3'hb: gpio_rdata <= {31'd0, VGA_SDA};
+                    4'd8: gpio_rdata <= {31'd0, AUDIO_SCL};
+                    4'd9: gpio_rdata <= {31'd0, AUDIO_SDA};
+                    4'hb: gpio_rdata <= {31'd0, VGA_SDA};
+                    4'hc: gpio_rdata <= {30'd0, opl3_data_ovfl, opl3_data_rdy};
                 endcase
              end
-         if (!rst_rv) begin
+         if (!rst_rv_) begin
             delay_sel_val[4:0] <= delay_sel_val_det[4:0];
-            led_green <= 1'b0;
-            led_red <= 1'b0;
-            led_blue <= 1'b0;
+            led_green <= 0;
+            led_red <= 0;
+            led_blue <= 0;
+            opl3_last_sample_clk <= 0;
+            opl3_data_rdy <= 0;
+            opl3_data_ovfl <= 0;
         end
     end
     
@@ -592,7 +603,7 @@ module pano_top(
     assign SPI_SCK = spi_clk;
     assign SPI_MOSI = spi_do;
     assign spi_di = SPI_MISO;
-    assign AUDIO_SCL = codec_i2c_scl;
+    assign AUDIO_SCL = (codec_i2c_scl) ? 1'bz : 1'b0;
     assign AUDIO_SDA = (codec_i2c_sda) ? 1'bz : 1'b0;
     assign USB_RESET_B = usb_rstn;
     assign USB_HUB_RESET_B = usb_rstn;
@@ -615,7 +626,7 @@ module pano_top(
     
     vga_mixer vga_mixer(
         .clk(clk_vga),
-        .rst(rst),
+        .rst(rst_12),
         // GameBoy Image Input
         .gb_hs(1'b0),
         .gb_vs(1'b0),
@@ -662,19 +673,31 @@ module pano_top(
     );
     assign dbg_char = vram_dout[6:0];
 
+    wire signed [18:0] left_pre, right_pre;
+    wire signed [15:0] left, right;
+
+    assign left_pre = opl2_channel_a<<<1;
+    assign left = left_pre > 32767 ? 16'hffff : left_pre < -32768 ? 16'h0000 : left_pre[15:0];
+
+    assign right_pre = opl2_channel_b<<<1;
+    assign right = right_pre > 32767 ? 16'hffff : right_pre < -32768 ? 16'h0000: right_pre[15:0];
+
 // Audio codec
     audio codec_interface (
         .clk25(clk_25),
-        .reset25_(!rst),
-        .audio_mclk(AUDIO_MCLK),
-        .audio_bclk(AUDIO_BCLK),
+        .reset25(!rst_rv_),
+        .audio_bclk(audio_bclk),
         .audio_dacdat(AUDIO_DACDATA),
         .audio_daclrc(AUDIO_DACLRCK),
         .audio_adcdat(AUDIO_ADCDATA),
         .audio_adclrc(AUDIO_ADCLRCK),
-        .audio_right_sample(audio_right_sample),
-        .audio_left_sample(audio_left_sample)
+        .audio_right_sample(right),
+        .audio_left_sample(left),
+        .audio_sample_clk(opl3_sample_clk)
     );
+
+    assign AUDIO_BCLK = audio_bclk;
+    assign AUDIO_MCLK = audio_bclk;
 
     
 // synthesis translate_off
