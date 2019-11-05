@@ -1,27 +1,51 @@
-# A port of the OPL3 to the Panologic G1 thin client
+# Yamaha OPL2 for the Panologic thin client
 
-** THIS PROJECT IS A WIP, IT IS NOT FUNCTIONAL!
+This is a port of Saanlima Electronics's port of Greg Taylor's clone of the
+OPL3 Yamaha YMF262 FM synthesis sound chip in System Verilog.  
 
-The plan was to port [opl3_fpga](https://github.com/gtaylormb/opl3_fpga) to the
-Panologic G1 thin client.
+If you don't know what a Panologic thin client is please see [here](https://hackaday.com/2013/01/11/ask-hackaday-we-might-have-some-fpgas-to-hack/) 
+and [here](https://github.com/skiphansen/pano_hello_g1) for background.
 
-Unfortunately it didn't fit.
+Magnus of Saanlima Electronics translated Greg Taylor's System Verilog HDL to 
+legacy Verilog because ISE for the Spartan 6 verson does't support 
+System Verilog. Since Magnus's interest was in running Doom he only 
+ported the OPL2 subset needed by Doom.
 
-`Place:665 - The design has 13 block-RAM components of which 4 block-RAM 
-components require the adjacent multiplier site to remain empty.  This is 
-because certain input pins of adjacent block-RAM and multiplier sites 
-share routing ressources.  In addition, the design has 35 multiplier 
-components.  Therefore, the design would require a total of 39 multiplier 
-sites on the device.  The current device has only 36 multiplier sites.`
+I made further modifications to the core OPL code to correct errors encountered 
+when using the Spartan 3 version of ISE.  I also and created an interface to 
+the Pano's Wolfson codec.
 
-I'm committing the work in case someone wants to take up the challenge since
-it's "close" to fitting.
+I had initially given up on the Pano G1 after the first cut didn't fit 
+because it ran out of multiplers. When I mentioned this to Tom Verbeure he 
+spent a few minutes studying the HDL then made a few tweaks and eliminated a 
+bunch of multipliers.  It now fits by a good margin (28% utilization).
 
-At least imfplay compiles and runs somewhat.
+The eventual plan is to use this core on other projects to do more interesting
+things.
 
-This project is based on [pano_hello_g1](https://github.com/skiphansen/pano_hello_g1),
-please see that project for more information.
+## Status
+The project builds and several of the test files play.  It is suspected 
+that the files that don't play are targeting an opl3 rather than an opl2.
 
-The Panologic G2 will solve this issue since it has 180 multiplers instead
-of 36 !
+A prebuilt demo bit and firmware file that plays a canned test file is provided 
+(./xilinx/panog1_opl3.msc) which plays a canned .dro.
+
+## Building and Installation
+Please see [pano_hello_g1](https://github.com/skiphansen/pano_hello_g1) for 
+more information and detailed information on how to flash the panog1_opl3.msc 
+image into a device.
+
+## Acknowledgement and Thanks
+This project uses code from several other projects including:
+ - [https://github.com/gtaylormb/opl3_fpga]
+ - [https://github.com/Saanlima/Pipistrello]
+ - [https://github.com/zephray/VerilogBoy]
+ - [https://github.com/cliffordwolf/picorv32](https://github.com/cliffordwolf/picorv32)
+ - [https://github.com/MParygin/v.vga.font8x16](https://github.com/MParygin/v.vga.font8x16)
+ - ]https://github.com/skiphansen/pano_hello_g1]
+
+## LEGAL 
+
+My original work (the Pano Codec glue code) is released under the GNU General 
+Public License, version 2.
 
