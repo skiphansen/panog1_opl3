@@ -18,17 +18,19 @@ the Pano's Wolfson codec.
 I had initially given up on the Pano G1 after the first cut didn't fit 
 because it ran out of multiplers. When I mentioned this to Tom Verbeure he 
 spent a few minutes studying the HDL then made a few tweaks and eliminated a 
-bunch of multipliers.  It now fits by a good margin (28% utilization).
+bunch of multipliers.  It now fits by a good margin (28% utilization including
+a RISC-V core, VGA and other glue logic).
 
 The eventual plan is to use this core on other projects to do more interesting
 things.
 
 ## Status
-The project builds and several of the test files play.  It is suspected 
-that the files that don't play are targeting an opl3 rather than an opl2.
+The project builds and the Doom test files play.  It is suspected that the 
+files that don't play are targeting an opl3 rather than an opl2.
 
 A prebuilt demo bit and firmware file that plays a canned test file is provided 
-(./xilinx/panog1_opl3.msc) which plays a canned .dro.
+(./xilinx/panog1_opl3.msc) which plays an .DRO file that has been compiled
+into the firmware.
 
 ## Building and Installation
 Please see [pano_hello_g1](https://github.com/skiphansen/pano_hello_g1) for 
