@@ -41,19 +41,21 @@
 
 /******************************************************************************
 #
-# Converted from systemVerilog to Verilog and reduced to the OPL2 subset
+# Converted from systemVerilog to Verilog
 # Copyright (C) 2018 Magnus Karlsson <magnus@saanlima.com>
 #
 *******************************************************************************/
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "../opl3.vh"
+`ifdef OPL3
 
 module tremolo (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
+    input wire [`BANK_NUM_WIDTH-1:0] bank_num,
     input wire [`OP_NUM_WIDTH-1:0] op_num,            
     input wire dam, // depth of tremolo
     output reg [`AM_VAL_WIDTH-1:0] am_val
@@ -72,7 +74,7 @@ module tremolo (
     always @(posedge clk)
         if (reset)
             tremolo_index <= 0;
-        else if (sample_clk_en && op_num == 0)
+        else if (sample_clk_en && bank_num == 0 && op_num == 0)
             if (tremolo_index == TREMOLO_MAX_COUNT - 1)
                 tremolo_index <= 0;
             else
@@ -89,5 +91,7 @@ module tremolo (
         else
             am_val <= am_val_tmp1 >> 2;
 endmodule
+`endif
 
-	
+
+    

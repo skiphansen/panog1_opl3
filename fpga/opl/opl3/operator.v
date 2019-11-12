@@ -41,19 +41,22 @@
 
 /******************************************************************************
 #
-# Converted from systemVerilog to Verilog and reduced to the OPL2 subset
+# Converted from systemVerilog to Verilog
 # Copyright (C) 2018 Magnus Karlsson <magnus@saanlima.com>
 #
 *******************************************************************************/
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "../opl3.vh"
+`ifdef OPL3
 
 module operator (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
+    input wire is_new,    
+    input wire [`BANK_NUM_WIDTH-1:0] bank_num,
     input wire [`OP_NUM_WIDTH-1:0] op_num,              
     input wire [`REG_FNUM_WIDTH-1:0] fnum,
     input wire [`REG_MULT_WIDTH-1:0] mult,
@@ -61,7 +64,8 @@ module operator (
     input wire [`REG_WS_WIDTH-1:0] ws,
     input wire vib,
     input wire dvb,
-    input wire [`NUM_OPERATORS_PER_BANK-1:0] kon,  
+    input wire [`NUM_OPERATORS_PER_BANK-1:0] kon_bank0,  
+    input wire [`NUM_OPERATORS_PER_BANK-1:0] kon_bank1,  
     input wire [`REG_ENV_WIDTH-1:0] ar, // attack rate
     input wire [`REG_ENV_WIDTH-1:0] dr, // decay rate
     input wire [`REG_ENV_WIDTH-1:0] sl, // sustain level
@@ -85,35 +89,41 @@ module operator (
     input wire [2:0] op_type,
     output wire signed [`OP_OUT_WIDTH-1:0] out
 );
-
-    wire [`NUM_OPERATORS_PER_BANK-1:0] key_on_pulse_array;
-    wire [`NUM_OPERATORS_PER_BANK-1:0] key_off_pulse_array;
+    wire [`NUM_OPERATORS_PER_BANK-1:0] kon [`NUM_BANKS-1:0];  
+    wire [`PHASE_ACC_WIDTH-1:0] phase_inc;
+    wire key_on_pulse;
+    wire key_on_pulse_array [`NUM_BANKS-1:0][`NUM_OPERATORS_PER_BANK-1:0];
+    wire key_off_pulse;
+    wire key_off_pulse_array [`NUM_BANKS-1:0][`NUM_OPERATORS_PER_BANK-1:0];
+    wire [`ENV_WIDTH-1:0] env;
+    reg signed [`OP_OUT_WIDTH-1:0] feedback1 [`NUM_BANKS-1:0][`NUM_OPERATORS_PER_BANK-1:0];
+    reg signed [`OP_OUT_WIDTH-1:0] feedback2 [`NUM_BANKS-1:0][`NUM_OPERATORS_PER_BANK-1:0];
+    wire signed [`OP_OUT_WIDTH-1:0] feedback_result;
+    reg signed [`OP_OUT_WIDTH+1+2**`REG_FB_WIDTH-1:0] feedback_result_p0;
     wire bd_on_pulse;
     wire sd_on_pulse;
     wire tom_on_pulse;
     wire tc_on_pulse;
     wire hh_on_pulse;
-    wire key_on_pulse;
-    wire key_off_pulse;
-    wire [`PHASE_ACC_WIDTH-1:0] phase_inc;
-    wire [`ENV_WIDTH-1:0] env;
-    reg signed [`OP_OUT_WIDTH-1:0] feedback1 [0:`NUM_OPERATORS_PER_BANK-1];
-    reg signed [`OP_OUT_WIDTH-1:0] feedback2 [0:`NUM_OPERATORS_PER_BANK-1];
-    wire signed [`OP_OUT_WIDTH-1:0] feedback_result;
-    reg signed [`OP_OUT_WIDTH+1+2**`REG_FB_WIDTH-1:0] feedback_result_p0;
     wire rhythm_kon_pulse;
 
-    genvar j;
+    assign kon[0] = kon_bank0;
+    assign kon[1] = kon_bank1;
+
+    genvar i, j;
     generate
-        for (j = 0; j < `NUM_OPERATORS_PER_BANK; j = j + 1) begin: detect
-            // Detect key on and key off
+        for (i = 0; i < `NUM_BANKS; i = i + 1) begin: detecti
+            for (j = 0; j < `NUM_OPERATORS_PER_BANK; j = j + 1) begin: detectj
+                /*
+                 * Detect key on and key off
+                 */
             edge_detector #(
                 .EDGE_LEVEL(1), 
                 .CLK_DLY(1)
             ) key_on_edge_detect (
-                .clk_en(j == op_num && sample_clk_en),
-                .in(kon[j]), 
-                .edge_detected(key_on_pulse_array[j]),
+                    .clk_en(i == bank_num && j == op_num && sample_clk_en),
+                    .in(kon[i][j]), 
+                    .edge_detected(key_on_pulse_array[i][j]),
                 .clk(clk)
             );
             
@@ -121,11 +131,12 @@ module operator (
                 .EDGE_LEVEL(0), 
                 .CLK_DLY(1)
             ) key_off_edge_detect (
-                .clk_en(j == op_num && sample_clk_en && op_type == `OP_NORMAL),
-                .in(kon[j]), 
-                .edge_detected(key_off_pulse_array[j]),
+                    .clk_en(i == bank_num && j == op_num && sample_clk_en && op_type == `OP_NORMAL),
+                    .in(kon[i][j]), 
+                    .edge_detected(key_off_pulse_array[i][j]),
                 .clk(clk)
             );                                   
+            end
         end
     endgenerate  
 
@@ -182,33 +193,25 @@ module operator (
      (op_type == `OP_TOP_CYMBAL && tc_on_pulse) ||
      (op_type == `OP_HI_HAT && hh_on_pulse);
     
-    assign key_on_pulse = key_on_pulse_array[op_num] || rhythm_kon_pulse;
-    assign key_off_pulse = key_off_pulse_array[op_num];
+    assign key_on_pulse = key_on_pulse_array[bank_num][op_num] || rhythm_kon_pulse;
+    assign key_off_pulse = key_off_pulse_array[bank_num][op_num];
     
     /*
      * latch_feedback_pulse comes in the last cycle of the time slot so out has had a
      * chance to propagate through
      */
-    generate
-        for (j = 0; j < `NUM_OPERATORS_PER_BANK; j = j + 1) begin: named
-            always @(posedge clk) begin
-                if (reset) begin
-                    feedback1[j] <= 0;
-                    feedback2[j] <= 0;
-                end else if (latch_feedback_pulse && (op_num == j)) begin
-                    feedback1[j] <= out;
-                    feedback2[j] <= feedback1[j];
-                end
-            end
+    always @(posedge clk)
+        if (latch_feedback_pulse) begin
+            feedback1[bank_num][op_num] <= out;
+            feedback2[bank_num][op_num] <= feedback1[bank_num][op_num];
         end
-    endgenerate
     
     always @ *
         if (fb == 0)
             feedback_result_p0 = 0;
         else
-            feedback_result_p0 = ((feedback1[op_num] +
-             feedback2[op_num]) <<< fb);
+            feedback_result_p0 = ((feedback1[bank_num][op_num] +
+             feedback2[bank_num][op_num]) <<< fb);
         
     assign feedback_result = feedback_result_p0 >>> 9;
     
@@ -228,6 +231,7 @@ module operator (
         .clk(clk),
         .reset(reset),
         .sample_clk_en(sample_clk_en),
+        .bank_num(bank_num),
         .op_num(op_num),
         .ar(ar),
         .dr(dr),
@@ -255,6 +259,8 @@ module operator (
         .clk(clk),
         .reset(reset),
         .sample_clk_en(sample_clk_en),
+        .is_new(is_new),
+        .bank_num(bank_num),
         .op_num(op_num),
         .phase_inc(phase_inc),
         .ws(ws),
@@ -265,3 +271,5 @@ module operator (
         .out(out)
     );
 endmodule
+`endif
+

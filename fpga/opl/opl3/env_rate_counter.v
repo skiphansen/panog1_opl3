@@ -41,19 +41,21 @@
 
 /******************************************************************************
 #
-# Converted from systemVerilog to Verilog and reduced to the OPL2 subset
+# Converted from systemVerilog to Verilog
 # Copyright (C) 2018 Magnus Karlsson <magnus@saanlima.com>
 #
 *******************************************************************************/
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "../opl3.vh"
+`ifdef OPL3
 
 module env_rate_counter (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
+    input wire [`BANK_NUM_WIDTH-1:0] bank_num,
     input wire [`OP_NUM_WIDTH-1:0] op_num,                  
     input wire ksr, // key scale rate    
     input wire nts, // keyboard split selection
@@ -72,7 +74,7 @@ module env_rate_counter (
     wire [`ENV_RATE_COUNTER_OVERFLOW_WIDTH-1:0] rate_value;
     wire [`ENV_RATE_COUNTER_OVERFLOW_WIDTH-1:0] requested_rate_shifted;
     wire [1:0] rof;
-    reg [COUNTER_WIDTH-1:0] counter [0:`NUM_OPERATORS_PER_BANK-1];
+    reg [COUNTER_WIDTH-1:0] counter [`NUM_BANKS-1:0][`NUM_OPERATORS_PER_BANK-1:0];
 //  wire [$clog2(OVERFLOW_TMP_MAX_VALUE)-1:0] overflow_tmp;
     wire [`CLOG2(OVERFLOW_TMP_MAX_VALUE)-1:0] overflow_tmp;
     reg sample_clk_en_d0;
@@ -94,23 +96,16 @@ module env_rate_counter (
         else
             sample_clk_en_d0 <= sample_clk_en;
 
-    genvar i;
-    generate
-        for (i = 0; i < `NUM_OPERATORS_PER_BANK; i = i + 1) begin: named
-            always @(posedge clk) begin
-                if (reset)
-                    counter[i] <= 0;
-                else if (sample_clk_en_d0 && requested_rate != 0 && (op_num == i))
-                    counter[i] <= counter[i] + ((4 | rof) << rate_value);
-            end
-        end
-    endgenerate
+    always @(posedge clk)
+        if (sample_clk_en_d0 && requested_rate != 0)
+            counter[bank_num][op_num] <= counter[bank_num][op_num] + ((4 | rof) << rate_value);
         
-    assign overflow_tmp = counter[op_num] + ((4 | rof) << rate_value);
+    assign overflow_tmp = counter[bank_num][op_num] + ((4 | rof) << rate_value);
     
     assign
         rate_counter_overflow = overflow_tmp >> 15;
     
 endmodule
+`endif
 
     

@@ -48,7 +48,8 @@
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "../opl3.vh"
+`ifndef OPL3
 
 module phase_generator (
     input wire clk,
@@ -62,7 +63,7 @@ module phase_generator (
     input wire [`OP_OUT_WIDTH-1:0] modulation,
     input wire [2:0] op_type,    
     output reg signed [`OP_OUT_WIDTH-1:0] out
-);	
+);  
     localparam LOG_SIN_OUT_WIDTH = 12;
     localparam EXP_OUT_WIDTH = 10;
     localparam LOG_SIN_PLUS_GAIN_WIDTH = 13;
@@ -175,5 +176,6 @@ module phase_generator (
             default:      out <= tmp_out2 << 1;
             endcase      
 endmodule
+`endif
 
-	
+    

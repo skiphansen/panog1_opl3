@@ -1,14 +1,14 @@
 /*******************************************************************************
 #   +html+<pre>
 #
-#   FILENAME: ksl_add_rom.sv
-#   AUTHOR: Greg Taylor     CREATION DATE: 31 Oct 2014
+#   FILENAME: vibrato.sv
+#   AUTHOR: Greg Taylor     CREATION DATE: 13 Oct 2014
 #
 #   DESCRIPTION:
-#   Values extracted from real chip ROM
+#   Prepare the phase increment for the NCO (calc multiplier and vibrato)
 #
 #   CHANGE HISTORY:
-#   31 Oct 2014    Greg Taylor
+#   13 Oct 2014    Greg Taylor
 #       Initial version
 #
 #   Copyright (C) 2014 Greg Taylor <gtaylor@sonic.net>
@@ -42,7 +42,7 @@
 
 /******************************************************************************
 #
-# Converted from systemVerilog to Verilog and reduced to the OPL2 subset
+# Converted from systemVerilog to Verilog
 # Copyright (C) 2018 Magnus Karlsson <magnus@saanlima.com>
 #
 *******************************************************************************/
@@ -51,59 +51,38 @@
 
 `include "opl3.vh"
 
-module ksl_add_rom # (
-    parameter integer KSL_ADD_WIDTH = 8 // do not override
-) (
+module vibrato (
     input wire clk,
     input wire reset,
+    input wire sample_clk_en,   
     input wire [`REG_FNUM_WIDTH-1:0] fnum,
-    input wire [`REG_BLOCK_WIDTH-1:0] block,
-    input wire [`REG_KSL_WIDTH-1:0] ksl,
-    output reg [KSL_ADD_WIDTH-1:0] ksl_add
+    input wire dvb,    
+    output reg [`REG_FNUM_WIDTH-1:0] vib_val
 );
-    reg [6:0] rom_out = 0;
-    wire signed [KSL_ADD_WIDTH-1:0] tmp0;
-    wire signed [KSL_ADD_WIDTH-1:0] tmp1;
-    wire [`REG_FNUM_WIDTH-6-1:0] fnum_shifted;
+    localparam VIBRATO_INDEX_WIDTH = 13;
     
-    assign fnum_shifted = fnum >> 6;
+    reg [VIBRATO_INDEX_WIDTH-1:0] vibrato_index = 0;
+    wire [`REG_FNUM_WIDTH-1:0] delta0;
+    wire [`REG_FNUM_WIDTH-1:0] delta1;
+    wire [`REG_FNUM_WIDTH-1:0] delta2;
+        
+    /*
+     * Low-Frequency Oscillator (LFO)
+     * 6.07Hz (Sample Freq/2**13)
+     */        
+    always @(posedge clk)
+        if (reset)
+            vibrato_index <= 0;
+        else if (sample_clk_en)
+            vibrato_index <= vibrato_index + 1;
+        
+    assign delta0 = fnum >> 7;
+    assign delta1 = ((vibrato_index >> 10) & 3) == 3 ? delta0 >> 1 : delta0;
+    assign delta2 = !dvb ? delta1 >> 1 : delta1;
     
     always @(posedge clk)
         if (reset)
-            rom_out <= 0;
+            vib_val <= 0;
         else
-            case (fnum_shifted)
-            0: rom_out <= 0;
-            1: rom_out <= 32;
-            2: rom_out <= 40;
-            3: rom_out <= 45;
-            4: rom_out <= 48;
-            5: rom_out <= 51;
-            6: rom_out <= 53;
-            7: rom_out <= 55;
-            8: rom_out <= 56;
-            9: rom_out <= 58;
-            10: rom_out <= 59;
-            11: rom_out <= 60;
-            12: rom_out <= 61;
-            13: rom_out <= 62;
-            14: rom_out <= 63;
-            15: rom_out <= 64;
-            endcase
-    
-    assign tmp0 = block - 8;            
-    assign tmp1 = rom_out + (tmp0 << 3);
-    
-    always @(posedge clk)
-        if (reset)
-            ksl_add <= 0;
-        else
-            case (ksl)
-            0: ksl_add <= 0;
-            1: ksl_add <= tmp1 <= 0 ? 0 : tmp1 << 1;
-            2: ksl_add <= tmp1 <= 0 ? 0 : tmp1;
-            3: ksl_add <= tmp1 <= 0 ? 0 : tmp1 << 2;
-            endcase
+            vib_val <= ((vibrato_index >> 10) & 4) != 0 ? ~delta2 : delta2;
 endmodule
-
-    

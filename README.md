@@ -7,9 +7,9 @@ If you don't know what a Panologic thin client is please see [here](https://hack
 and [here](https://github.com/skiphansen/pano_hello_g1) for background.
 
 Magnus of Saanlima Electronics translated Greg Taylor's System Verilog HDL to 
-legacy Verilog because ISE for the Spartan 6 verson does't support 
-System Verilog. Since Magnus's interest was in running Doom he only 
-ported the OPL2 subset needed by Doom.
+legacy Verilog because ISE for the Spartan 6 doesn't support System Verilog. 
+Since Magnus's interest was in running Doom he only ported the OPL2 subset 
+needed by Doom.
 
 I made further modifications to the core OPL code to correct errors encountered 
 when using the Spartan 3 version of ISE.  I also and created an interface to 
@@ -18,17 +18,18 @@ the Pano's Wolfson codec.
 I had initially given up on the Pano G1 after the first cut didn't fit 
 because it ran out of multiplers. When I mentioned this to Tom Verbeure he 
 spent a few minutes studying the HDL then made a few tweaks and eliminated a 
-bunch of multipliers.  It now fits by a good margin (28% utilization).
+bunch of multipliers.  It now fits by a good margin (28% utilization including
+a RISC-V core, VGA and other glue logic).
 
 The eventual plan is to use this core on other projects to do more interesting
 things.
 
 ## Status
-The project builds and several of the test files play.  It is suspected 
-that the files that don't play are targeting an opl3 rather than an opl2.
+The project builds and the Doom test files play.  It is suspected that the 
+files that don't play are targeting an opl3 rather than an opl2.
 
-A prebuilt demo bit and firmware file that plays a canned test file is provided 
-(./xilinx/panog1_opl3.msc) which plays a canned .dro.
+A prebuilt demo bit and firmware file is committed (./xilinx/panog1_opl3.msc) 
+which plays an .DRO file that has been compiled into the firmware.
 
 ## Building and Installation
 Please see [pano_hello_g1](https://github.com/skiphansen/pano_hello_g1) for 
@@ -42,7 +43,7 @@ This project uses code from several other projects including:
  - [https://github.com/zephray/VerilogBoy]
  - [https://github.com/cliffordwolf/picorv32](https://github.com/cliffordwolf/picorv32)
  - [https://github.com/MParygin/v.vga.font8x16](https://github.com/MParygin/v.vga.font8x16)
- - ]https://github.com/skiphansen/pano_hello_g1]
+ - [https://github.com/skiphansen/pano_hello_g1]
 
 ## LEGAL 
 

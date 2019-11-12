@@ -1,14 +1,13 @@
 /*******************************************************************************
 #   +html+<pre>
 #
-#   FILENAME: vibrato.sv
-#   AUTHOR: Greg Taylor     CREATION DATE: 13 Oct 2014
+#   FILENAME: tremolo.sv
+#   AUTHOR: Greg Taylor     CREATION DATE: 2 Nov 2014
 #
 #   DESCRIPTION:
-#   Prepare the phase increment for the NCO (calc multiplier and vibrato)
 #
 #   CHANGE HISTORY:
-#   13 Oct 2014    Greg Taylor
+#   2 Nov 2014    Greg Taylor
 #       Initial version
 #
 #   Copyright (C) 2014 Greg Taylor <gtaylor@sonic.net>
@@ -49,40 +48,49 @@
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "../opl3.vh"
+`ifndef OPL3
 
-module vibrato (
+module tremolo (
     input wire clk,
     input wire reset,
-    input wire sample_clk_en,   
-    input wire [`REG_FNUM_WIDTH-1:0] fnum,
-    input wire dvb,    
-    output reg [`REG_FNUM_WIDTH-1:0] vib_val
+    input wire sample_clk_en,
+    input wire [`OP_NUM_WIDTH-1:0] op_num,            
+    input wire dam, // depth of tremolo
+    output reg [`AM_VAL_WIDTH-1:0] am_val
 );
-    localparam VIBRATO_INDEX_WIDTH = 13;
+    localparam TREMOLO_MAX_COUNT = 13*1024;
+    localparam TREMOLO_INDEX_WIDTH = 14;
     
-    reg [VIBRATO_INDEX_WIDTH-1:0] vibrato_index = 0;
-    wire [`REG_FNUM_WIDTH-1:0] delta0;
-    wire [`REG_FNUM_WIDTH-1:0] delta1;
-    wire [`REG_FNUM_WIDTH-1:0] delta2;
-        
+    reg [TREMOLO_INDEX_WIDTH-1:0] tremolo_index;
+    wire [TREMOLO_INDEX_WIDTH-8-1:0] am_val_tmp0;
+    wire [TREMOLO_INDEX_WIDTH-8-1:0] am_val_tmp1;
+    
     /*
      * Low-Frequency Oscillator (LFO)
-     * 6.07Hz (Sample Freq/2**13)
-     */        
+     * 3.7 Hz (Sample Freq/2**14)
+     */            
     always @(posedge clk)
         if (reset)
-            vibrato_index <= 0;
-        else if (sample_clk_en)
-            vibrato_index <= vibrato_index + 1;
-        
-    assign delta0 = fnum >> 7;
-    assign delta1 = ((vibrato_index >> 10) & 3) == 3 ? delta0 >> 1 : delta0;
-    assign delta2 = !dvb ? delta1 >> 1 : delta1;
+            tremolo_index <= 0;
+        else if (sample_clk_en && op_num == 0)
+            if (tremolo_index == TREMOLO_MAX_COUNT - 1)
+                tremolo_index <= 0;
+            else
+                tremolo_index <= tremolo_index + 1;
     
+    assign am_val_tmp0 = tremolo_index >> 8;
+    assign am_val_tmp1 = (am_val_tmp0 > 26) ? (2*26 + ~am_val_tmp0) : am_val_tmp0;
+        
     always @(posedge clk)
         if (reset)
-            vib_val <= 0;
+            am_val <= 0;
+        else if (dam)
+            am_val <= am_val_tmp1;
         else
-            vib_val <= ((vibrato_index >> 10) & 4) != 0 ? ~delta2 : delta2;
+            am_val <= am_val_tmp1 >> 2;
 endmodule
+`endif
+
+
+    
