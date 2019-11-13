@@ -51,7 +51,7 @@ void TimerDelay(uint32_t x);
 #define XUartPs_IsReceiveData(x)  0
 #define XPAR_OPL3_FPGA_0_S_AXI_BASEADDR   0
 #define XPAR_PS7_UART_1_BASEADDR          0
-void Opl3WriteReg(uint8_t chip,uint8_t RegOffset,uint8_t Data);
+void Opl3WriteReg(uint8_t chip,uint16_t RegOffset,uint8_t Data);
 
 // #define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING

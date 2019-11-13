@@ -41,13 +41,13 @@
 
 /******************************************************************************
 #
-# Converted from systemVerilog to Verilog and reduced to the OPL2 subset
+# Converted from systemVerilog to Verilog
 # Copyright (C) 2018 Magnus Karlsson <magnus@saanlima.com>
 # Additional tweaks for Spartan 3 tools Skip Hansen 2019
 #
 *******************************************************************************/
 
-`include "../opl3.vh"
+`include "opl3.vh"
 
 module opl3(
   clk,       // 100 MHz system clock
@@ -56,7 +56,6 @@ module opl3(
   opl3_we,   // register write
   opl3_data, // register data
   opl3_adr,  // register address
-  kon,       // key on
   channel_a, // output channel a
   channel_b, // output channel b
   channel_c,
@@ -165,9 +164,9 @@ module opl3(
   reg signed [`SAMPLE_WIDTH-1:0] channel_2_op[1:0][8:0];
   reg signed [`SAMPLE_WIDTH-1:0] channel_4_op[1:0][2:0];
 
-  genvar i;
+  genvar i, j;
   generate
-    for (i = 0; i < 256; i = i + 1) begin: named
+    for (i = 0; i < 512; i = i + 1) begin: named
       always @ (posedge clk) begin
         if (reset)
           opl3_reg[i] <= 8'd0;
@@ -183,9 +182,14 @@ module opl3(
       sample_clk_en <= 1'b0;
       sample_clk <= 1'b0;
     end else begin
-    // Note: A "real" opl3 generates the sampling clock by dividing 14.318MHz
-    // by 288 for sampling rate of 49715.2777..
-    // 25 MHz clock (25 MHz/503 = 49702 Hz)
+// Note: A "real" opl3 generates the sampling clock by dividing 14.318MHz
+// by 288 for sampling rate of 49715.2777.
+// 25 MHz clock (25 MHz/503 = 49702 Hz)
+
+// Pano port: The Wolfson Codec used in the Pano requires a MCLK which is 
+// the sampling rate times 250.  We'll divide 25 Mhz by 500 for the sample
+// clock and divide by 2 for MCLK
+
 //    cntr <= cntr == 9'd502 ? 9'd0 : cntr + 1'b1;
       cntr <= cntr == 9'd499 ? 9'd0 : cntr + 1'b1;
       sample_clk_en <= cntr == 9'd0;
@@ -193,6 +197,8 @@ module opl3(
       sample_clk_128 <= ~cntr[0];
     end
 
+  localparam BANK2_OFFSET = 256;
+  
   /*
    * Registers that are not specific to a particular bank
    */
@@ -222,10 +228,9 @@ module opl3(
       hh  <= opl3_reg['hBD][0];                 
     end
        
-  genvar i, j;
   generate
-  for (i = 0; i < 2; i = i + 1) begin
-    for (j = 0; j < 6; j = j + 1)
+  for (i = 0; i < 2; i = i + 1) begin: name1
+    for (j = 0; j < 6; j = j + 1) begin: name2
       always @(posedge clk_opl3)
         if (sample_clk_en) begin
           am[i][j]   <= opl3_reg['h20+j+i*BANK2_OFFSET][7];
@@ -245,27 +250,28 @@ module opl3(
             
           ws[i][j] <= opl3_reg['hE0+j+i*BANK2_OFFSET][2:0];           
         end
+     end
 
-    for (i = 6; i < 12; i = i + 1) begin: name2
-      always @(posedge clk_opl3) begin
+    for (j = 6; j < 12; j = j + 1) begin: name3
+      always @(posedge clk_opl3)
         if (reset) begin
-          am[i]   <= 1'b0;
-          vib[i]  <= 1'b0;
-          egt[i]  <= 1'b0;
-          ksr[i]  <= 1'b0;
-          mult[i] <= 4'd0;
+          am[i][j]   <= 1'b0;
+          vib[i][j]  <= 1'b0;
+          egt[i][j]  <= 1'b0;
+          ksr[i][j]  <= 1'b0;
+          mult[i][j] <= 4'd0;
             
-          ksl[i] <= 2'd0;
-          tl[i]  <= 6'd0;
+          ksl[i][j] <= 2'd0;
+          tl[i][j]  <= 6'd0;
             
-          ar[i] <= 4'd0;
-          dr[i] <= 4'd0;
+          ar[i][j] <= 4'd0;
+          dr[i][j] <= 4'd0;
             
-          sl[i] <= 4'd0;
-          rr[i] <= 4'd0;
+          sl[i][j] <= 4'd0;
+          rr[i][j] <= 4'd0;
             
-          ws[i] <= 2'd0;        
-        if (sample_clk_en) begin         
+          ws[i][j] <= 2'd0;        
+        end else if (sample_clk_en) begin         
           am[i][j]   <= opl3_reg['h22+j+i*BANK2_OFFSET][7];
           vib[i][j]  <= opl3_reg['h22+j+i*BANK2_OFFSET][6];
           egt[i][j]  <= opl3_reg['h22+j+i*BANK2_OFFSET][5];
@@ -283,26 +289,27 @@ module opl3(
               
           ws[i][j] <= opl3_reg['hE2+j+i*BANK2_OFFSET][2:0];         
         end
+     end
     
-    for (i = 12; i < 18; i = i + 1) begin: name3
-      always @(posedge clk_opl3) begin
+    for (j = 12; j < 18; j = j + 1) begin : name4
+      always @(posedge clk_opl3)
         if (reset) begin
-          am[i]   <= 1'b0;
-          vib[i]  <= 1'b0;
-          egt[i]  <= 1'b0;
-          ksr[i]  <= 1'b0;
-          mult[i] <= 4'd0;
+          am[i][j]   <= 1'b0;
+          vib[i][j]  <= 1'b0;
+          egt[i][j]  <= 1'b0;
+          ksr[i][j]  <= 1'b0;
+          mult[i][j] <= 4'd0;
             
-          ksl[i] <= 2'd0;
-          tl[i]  <= 6'd0;
+          ksl[i][j] <= 2'd0;
+          tl[i][j]  <= 6'd0;
             
-          ar[i] <= 4'd0;
-          dr[i] <= 4'd0;
+          ar[i][j] <= 4'd0;
+          dr[i][j] <= 4'd0;
             
-          sl[i] <= 4'd0;
-          rr[i] <= 4'd0;
+          sl[i][j] <= 4'd0;
+          rr[i][j] <= 4'd0;
             
-          ws[i] <= 2'd0;        
+          ws[i][j] <= 2'd0;        
         end else if (sample_clk_en) begin            
           am[i][j]   <= opl3_reg['h24+j+i*BANK2_OFFSET][7];
           vib[i][j]  <= opl3_reg['h24+j+i*BANK2_OFFSET][6];
@@ -321,21 +328,22 @@ module opl3(
               
           ws[i][j] <= opl3_reg['hE4+j+i*BANK2_OFFSET][2:0];         
         end
+     end
 
-    for (i = 0; i < 9; i = i + 1) begin: name4
-      always @(posedge clk_opl3) begin
+    for (j = 0; j < 9; j = j + 1) begin : name5
+      always @(posedge clk_opl3)
         if (reset) begin
-          fnum[i] <= 10'd0;
+          fnum[i][j] <= 10'd0;
 
-          kon[i] <= 1'b0;
-          block[i] <= 3'd0;
+          kon[i][j] <= 1'b0;
+          block[i][j] <= 3'd0;
           
-          chb[i] <= 1'b0;
-          cha[i] <= 1'b0;
-          fb[i]  <= 3'd0;
-          cnt[i] <= 1'b0;
+          chb[i][j] <= 1'b0;
+          cha[i][j] <= 1'b0;
+          fb[i][j]  <= 3'd0;
+          cnt[i][j] <= 1'b0;
         end else if (sample_clk_en) begin
-          fnum[i][7:0] <= opl3_reg['hA0+i];
+          fnum[i][j][7:0] <= opl3_reg['hA0+j+i*BANK2_OFFSET];
           fnum[i][j][9:8] <= opl3_reg['hB0+j+i*BANK2_OFFSET][1:0];
 
           kon[i][j] <= opl3_reg['hB0+j+i*BANK2_OFFSET][5];
@@ -348,10 +356,12 @@ module opl3(
           fb[i][j]  <= opl3_reg['hC0+j+i*BANK2_OFFSET][3:1];
           cnt[i][j] <= opl3_reg['hC0+j+i*BANK2_OFFSET][0];                
         end
-        end
-    endgenerate   
+     end
+  end
+  endgenerate   
 
-  always @ (*) begin
+
+  always @ * begin
     /*
      * Operator input mappings
      * 
@@ -819,7 +829,6 @@ module opl3(
     .egt(egt[bank_num][op_num]),
     .am(am[bank_num][op_num]),
     .dam(dam),
-    .dvb(dvb),
     .nts(nts),
     .bd(bd),
     .sd(sd),
@@ -884,7 +893,7 @@ module opl3(
     CALC_OUTPUTS: next_calc_state = bank == 1 && channel == 8 ? IDLE : CALC_OUTPUTS;
     endcase
       
-  always @(posedge clk_opl3) begin
+  always @(posedge clk_opl3)
     if (calc_state == IDLE || channel == 8)
       channel <= 0;
     else
@@ -897,7 +906,7 @@ module opl3(
       bank <= 1;     
 
   generate      
-  for (i = 0; i < `NUM_BANKS; i = i  + 1) begin
+  for (i = 0; i < `NUM_BANKS; i = i  + 1) begin : name6
     /*
      * 2 operator channel output connections
      */
@@ -955,52 +964,58 @@ module opl3(
       'b10: channel_4_op[i][2] = operator_out[i][2] + operator_out[i][11];
       'b11: channel_4_op[i][2] = operator_out[i][2] + operator_out[i][8] + operator_out[i][11];
       endcase 
-  end
+    end
   end 
   endgenerate    
     
   generate
-  for (i = 0; i < 3; i = i + 1) 
+  for (i = 0; i < 3; i = i + 1) begin : name7
     always @(posedge clk_opl3)
       if (cha[0][i] || !is_new)
         channel_a_acc_pre_clamp_p[0][i] <= connection_sel[i] && is_new ? channel_4_op[0][i] : channel_2_op[0][i];
       else
         channel_a_acc_pre_clamp_p[0][i] <= 0;
+   end
         
-  for (i = 3; i < 6; i = i + 1)
+  for (i = 3; i < 6; i = i + 1) begin : name8
     always @(posedge clk_opl3)
       if (cha[0][i] || !is_new)
         channel_a_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
       else
         channel_a_acc_pre_clamp_p[0][i] <= 0;
+   end
     
-  for (i = 6; i < 9; i = i + 1)
+  for (i = 6; i < 9; i = i + 1) begin : name9
     always @(posedge clk_opl3)
       if (cha[0][i] || !is_new)
         channel_a_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
       else
         channel_a_acc_pre_clamp_p[0][i] <= 0;
+  end
     
-  for (i = 0; i < 3; i = i + 1) 
+  for (i = 0; i < 3; i = i + 1) begin : name10
     always @(posedge clk_opl3)
       if (cha[1][i])
         channel_a_acc_pre_clamp_p[1][i] <= connection_sel[i+3] && is_new ? channel_4_op[1][i] : channel_2_op[1][i];
       else
         channel_a_acc_pre_clamp_p[1][i] <= 0;
+   end
       
-  for (i = 3; i < 6; i = i + 1)
+  for (i = 3; i < 6; i = i + 1) begin : name11
     always @(posedge clk_opl3)
       if (cha[1][i])
         channel_a_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
       else
         channel_a_acc_pre_clamp_p[1][i] <= 0;
+   end
   
-  for (i = 6; i < 9; i = i + 1)
+  for (i = 6; i < 9; i = i + 1) begin : name12
     always @(posedge clk_opl3)
       if (cha[1][i])
         channel_a_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
       else
         channel_a_acc_pre_clamp_p[1][i] <= 0; 
+  end
   endgenerate
   
   /*
@@ -1014,47 +1029,53 @@ module opl3(
       channel_a_acc_pre_clamp <= channel_a_acc_pre_clamp + channel_a_acc_pre_clamp_p[bank][channel];
       
   generate
-    for (i = 0; i < 3; i = i + 1) 
-      always @(posedge clk_opl3)
+    for (i = 0; i < 3; i = i + 1) begin : name13
+      always @(posedge clk_opl3) 
         if (chb[0][i] || !is_new)
           channel_b_acc_pre_clamp_p[0][i] <= connection_sel[i] && is_new ? channel_4_op[0][i] : channel_2_op[0][i];
         else
           channel_b_acc_pre_clamp_p[0][i] <= 0;
+    end
       
-    for (i = 3; i < 6; i = i + 1)
+    for (i = 3; i < 6; i = i + 1) begin : name14
       always @(posedge clk_opl3)
         if (chb[0][i] || !is_new)
           channel_b_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
         else
           channel_b_acc_pre_clamp_p[0][i] <= 0;
+    end
   
-    for (i = 6; i < 9; i = i + 1)
+    for (i = 6; i < 9; i = i + 1) begin : name15
       always @(posedge clk_opl3)
         if (chb[0][i] || !is_new)
           channel_b_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
         else
           channel_b_acc_pre_clamp_p[0][i] <= 0;
+    end
   
-    for (i = 0; i < 3; i = i + 1) 
+    for (i = 0; i < 3; i = i + 1) begin : name16
       always @(posedge clk_opl3)
         if (chb[1][i])
           channel_b_acc_pre_clamp_p[1][i] <= connection_sel[i+3] && is_new ? channel_4_op[1][i] : channel_2_op[1][i];
         else
           channel_b_acc_pre_clamp_p[1][i] <= 0;
+    end
     
-    for (i = 3; i < 6; i = i + 1)
+    for (i = 3; i < 6; i = i + 1) begin : name17
       always @(posedge clk_opl3)
         if (chb[1][i])
           channel_b_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
         else
           channel_b_acc_pre_clamp_p[1][i] <= 0;
+    end
 
-    for (i = 6; i < 9; i = i + 1)
+    for (i = 6; i < 9; i = i + 1) begin : name18
       always @(posedge clk_opl3)
         if (chb[1][i])
           channel_b_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
         else
           channel_b_acc_pre_clamp_p[1][i] <= 0; 
+    end
   endgenerate
   
   always @(posedge clk_opl3)
@@ -1064,47 +1085,53 @@ module opl3(
       channel_b_acc_pre_clamp <= channel_b_acc_pre_clamp + channel_b_acc_pre_clamp_p[bank][channel];  
       
   generate
-    for (i = 0; i < 3; i = i + 1) 
+    for (i = 0; i < 3; i = i + 1) begin : name19
       always @(posedge clk_opl3)
         if (chc[0][i] || !is_new)
           channel_c_acc_pre_clamp_p[0][i] <= connection_sel[i] && is_new ? channel_4_op[0][i] : channel_2_op[0][i];
         else
           channel_c_acc_pre_clamp_p[0][i] <= 0;
+    end
     
-    for (i = 3; i < 6; i = i + 1)
+    for (i = 3; i < 6; i = i + 1) begin : name20
       always @(posedge clk_opl3)
         if (chc[0][i] || !is_new)
           channel_c_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
         else
           channel_c_acc_pre_clamp_p[0][i] <= 0;
+    end
 
-    for (i = 6; i < 9; i = i + 1)
+    for (i = 6; i < 9; i = i + 1) begin : name21
       always @(posedge clk_opl3)
         if (chc[0][i] || !is_new)
           channel_c_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
         else
           channel_c_acc_pre_clamp_p[0][i] <= 0;
+    end
 
-    for (i = 0; i < 3; i = i + 1) 
+    for (i = 0; i < 3; i = i + 1) begin : name22
       always @(posedge clk_opl3)
         if (chc[1][i])
           channel_c_acc_pre_clamp_p[1][i] <= connection_sel[i+3] && is_new ? channel_4_op[1][i] : channel_2_op[1][i];
         else
           channel_c_acc_pre_clamp_p[1][i] <= 0;
+    end
   
-    for (i = 3; i < 6; i = i + 1)
+    for (i = 3; i < 6; i = i + 1) begin : name23
       always @(posedge clk_opl3)
         if (chc[1][i])
           channel_c_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
         else
           channel_c_acc_pre_clamp_p[1][i] <= 0;
+    end
 
-    for (i = 6; i < 9; i = i + 1)
+    for (i = 6; i < 9; i = i + 1) begin : name24
       always @(posedge clk_opl3)
         if (chc[1][i])
           channel_c_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
         else
           channel_c_acc_pre_clamp_p[1][i] <= 0; 
+    end
   endgenerate
   
   always @(posedge clk_opl3)
@@ -1114,47 +1141,53 @@ module opl3(
       channel_c_acc_pre_clamp <= channel_c_acc_pre_clamp + channel_c_acc_pre_clamp_p[bank][channel];  
       
   generate
-    for (i = 0; i < 3; i = i + 1) 
+    for (i = 0; i < 3; i = i + 1) begin : name25
       always @(posedge clk_opl3)
         if (chd[0][i] || !is_new)
           channel_d_acc_pre_clamp_p[0][i] <= connection_sel[i] && is_new ? channel_4_op[0][i] : channel_2_op[0][i];
         else
           channel_d_acc_pre_clamp_p[0][i] <= 0;
+    end
   
-    for (i = 3; i < 6; i = i + 1)
+    for (i = 3; i < 6; i = i + 1) begin : name26
       always @(posedge clk_opl3)
         if (chd[0][i] || !is_new)
           channel_d_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
         else
           channel_d_acc_pre_clamp_p[0][i] <= 0;
+    end
 
-    for (i = 6; i < 9; i = i + 1)
+    for (i = 6; i < 9; i = i + 1) begin : name27
       always @(posedge clk_opl3)
         if (chd[0][i] || !is_new)
           channel_d_acc_pre_clamp_p[0][i] <= channel_2_op[0][i];
         else
           channel_d_acc_pre_clamp_p[0][i] <= 0;
+    end
 
-    for (i = 0; i < 3; i = i + 1) 
+    for (i = 0; i < 3; i = i + 1)  begin : name28
       always @(posedge clk_opl3)
         if (chd[1][i])
           channel_d_acc_pre_clamp_p[1][i] <= connection_sel[i+3] && is_new ? channel_4_op[1][i] : channel_2_op[1][i];
         else
           channel_d_acc_pre_clamp_p[1][i] <= 0;
+    end
 
-    for (i = 3; i < 6; i = i + 1)
+    for (i = 3; i < 6; i = i + 1) begin : name29
       always @(posedge clk_opl3)
         if (chd[1][i])
           channel_d_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
         else
           channel_d_acc_pre_clamp_p[1][i] <= 0;
+    end
 
-    for (i = 6; i < 9; i = i + 1)
+    for (i = 6; i < 9; i = i + 1) begin : name30
       always @(posedge clk_opl3)
         if (chd[1][i])
           channel_d_acc_pre_clamp_p[1][i] <= channel_2_op[1][i];
         else
           channel_d_acc_pre_clamp_p[1][i] <= 0; 
+    end
   endgenerate
   
   always @(posedge clk_opl3)

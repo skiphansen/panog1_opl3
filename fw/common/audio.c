@@ -7,8 +7,18 @@
 #define DEBUG_LOGGING
 #include "log.h"
 
-// Sampling rate for opl3 is 49715.2777, the FPGA implementation is
-// 25 MHz/503 = 49.702 kHz
+// The sampling rate for real opl3 is 14.31818 MHz/288 = 49715.2777.
+// The Wolfson codec supports sample rates of 8kHz, 11.025kHz, 12kHz,
+// 16kHz, 22.05kHz, 24kHz, 32kHz, 44.1kHz, 48kHz, 88.2kHz and 96kHz.
+// The codec will be configured for the closest available sampling rate 
+// of 48 Khz.
+// 
+// The codec requires a MCLK that is a multiple of the sampling rate(fs).  
+// When using a 48Khz sampling rate the choices are 250fs, 256fs or 384fs.
+// 
+// Considering the above and after much experimentation it was decided to
+// use a sampling rate of 50 Khz (25 MHz/500) which is 57% faster than ideal.
+// MCLK and BCLK are 250fs (25 Mhz / 2).
 short int audio_registers[][2] = {
     { WM8750_LOUT1_VOL_ADDR,            (0<<8) |    // LO2VU    : Don't update LOUT1 volume yet
                                         (0<<7) |    // LO2ZC    : Change gain on zero cross only
@@ -31,9 +41,9 @@ short int audio_registers[][2] = {
                                         (0<<2) |    // WL     : 16 bits
                                         (3<<0) },   // FORMAT : DSP mode
 
-    // MCLK 25 MHz, around a 48kHz sample rate
+    // MCLK 12.5 MHz, around a 48kHz sample rate
     { WM8750_SAMPLE_RATE_ADDR,          (0<<7) |    // BCM    : Bit Clock Mode disabled
-                                        (0<<6) |    // CLKDIV2: MCLK divided by 2
+                                        (0<<6) |    // CLKDIV2: MCLK is not divided by 2
                                         (0<<1) |    // SR     : ADC and DAC 48kHz
                                         (1<<0) },   // USB    : USB clock mode 
     // Set left and right channel volume

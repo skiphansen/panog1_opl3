@@ -48,10 +48,9 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifndef OPL3
+`include "opl2.vh"
 
-module envelope_generator #(
+module opl2_envelope_generator #(
     parameter SILENCE = 511
 )(
     input wire clk,
@@ -142,7 +141,7 @@ module envelope_generator #(
     /*
      * Calculate rate_counter_overflow
      */            
-    env_rate_counter env_rate_counter (
+    opl2_env_rate_counter opl2_env_rate_counter (
         .clk(clk),
         .reset(reset),
         .sample_clk_en(sample_clk_en),
@@ -185,7 +184,7 @@ module envelope_generator #(
     /*
      * Calculate am_val
      */
-    tremolo tremolo (
+    opl2_tremolo opl2_tremolo (
         .clk(clk),
         .reset(reset),
         .sample_clk_en(sample_clk_en),
@@ -211,5 +210,4 @@ module envelope_generator #(
             env <= env_tmp;
     
 endmodule
-`endif
 

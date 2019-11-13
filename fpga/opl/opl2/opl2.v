@@ -47,7 +47,7 @@
 #
 *******************************************************************************/
 
-`include "../opl3.vh"
+`include "opl2.vh"
 
 module opl2(
   clk,       // 100 MHz system clock
@@ -181,9 +181,14 @@ module opl2(
       sample_clk_en <= 1'b0;
       sample_clk <= 1'b0;
     end else begin
-    // Note: A "real" opl3 generates the sampling clock by dividing 14.318MHz
-    // by 288 for sampling rate of 49715.2777..
-    // 25 MHz clock (25 MHz/503 = 49702 Hz)
+// Note: A "real" opl3 generates the sampling clock by dividing 14.318MHz
+// by 288 for sampling rate of 49715.2777.
+// 25 MHz clock (25 MHz/503 = 49702 Hz)
+
+// Pano port: The Wolfson Codec used in the Pano requires a MCLK which is 
+// the sampling rate times 250.  We'll divide 25 Mhz by 500 for the sample
+// clock and divide by 2 for MCLK
+
 //    cntr <= cntr == 9'd502 ? 9'd0 : cntr + 1'b1;
       cntr <= cntr == 9'd499 ? 9'd0 : cntr + 1'b1;
       sample_clk_en <= cntr == 9'd0;
@@ -567,7 +572,7 @@ module opl2(
    * One operator is instantiated; it replicates the necessary registers for
    * all operator slots (phase accumulation, envelope state and value, etc).
    */    
-  operator operator_inst(
+  opl2_operator operator_inst(
     .clk(OPL2_clk),
     .reset(reset),
     .sample_clk_en(delay_state != 0 && delay_counter == 0),
@@ -727,3 +732,4 @@ module opl2(
     end
 
 endmodule
+

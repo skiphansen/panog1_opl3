@@ -49,7 +49,7 @@
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "opl.vh"
 
 module calc_phase_inc (
     input wire clk,

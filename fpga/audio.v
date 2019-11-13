@@ -13,24 +13,18 @@ module audio(
     input  wire audio_sample_clk
     );
 
-// Mclk = 25.00 Mhz 
-// (ideally should have been 49715.90 * 250 * 2 = 24.86 but we hope it's close enough
-// DSP Mode, mode B, LRP=1, Slave (Figure 23), 16 bits
-//    { WM8750_AUDIO_INTFC_ADDR,
-//          (0<<7) |    // BCLKINV: BCLK not inverted
-//          (0<<6) |    // MS     : Slave mode
-//          (0<<5) |    // LRSWAP : No L/R swap
-//          (1<<4) |    // LRP    : DSP mode B: MSB on first clock cycle
-//          (0<<2) |    // WL     : 16 bits
-//          (3<<0) },   // FORMAT : DSP mode
-
-
-// There are 503 25 Mhz clocks per sample for a sampling rate 49701.79 hz.
-// We need 250 bclk cycles during this time for the Codec.
-// bclk is clk25 / 2 so each bclk each bclk is 2 clocks except the high
-// period is 4 cycles
+// The sampling rate for real opl3 is 14.31818MHz/288 = 49715.2777.
+// The Wolfson codec supports sample rates of 8kHz, 11.025kHz, 12kHz,
+// 16kHz, 22.05kHz, 24kHz, 32kHz, 44.1kHz, 48kHz, 88.2kHz and 96kHz.
+// The codec will be configured for the closest available sampling rate 
+// of 48 Khz.
 // 
-
+// The codec requires a MCLK that is a multiple of the sampling rate(fs).  
+// When using a 48Khz sampling rate the choices are 250fs, 256fs or 384fs.
+// 
+// Considering the above and after much experimentation it was decided to
+// use a sampling rate of 50 Khz (25 MHz/500) which is 57% faster than ideal.
+// MCLK and BCLK are 250fs (25 Mhz / 2).
 
     reg [5:0]  bit_cntr;
     reg last_audio_sample_clk;

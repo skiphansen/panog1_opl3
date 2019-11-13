@@ -48,10 +48,9 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifndef OPL3
+`include "opl2.vh"
 
-module phase_generator (
+module opl2_phase_generator (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
@@ -98,7 +97,7 @@ module phase_generator (
      * Some rhythm instruments require further transformations to the phase.
      * Pass through phase_acc[op_num] normally.
      */
-    calc_rhythm_phase calc_rhythm_phase (
+    opl2_calc_rhythm_phase calc_rhythm_phase (
         .clk(clk),
         .reset(reset),
         .sample_clk_en(sample_clk_en),
@@ -176,6 +175,5 @@ module phase_generator (
             default:      out <= tmp_out2 << 1;
             endcase      
 endmodule
-`endif
 
     

@@ -49,15 +49,6 @@
 `define REG_MULT_WIDTH 4
 `define REG_FNUM_WIDTH 10
 `define REG_BLOCK_WIDTH 3
-`ifdef OPL3
-`define REG_TIMER_WIDTH 8
-`define REG_CONNECTION_SEL_WIDTH 6
-`define REG_WS_WIDTH 3
-`define NUM_BANKS 2
-`define BANK_NUM_WIDTH 1
-`else
-`define REG_WS_WIDTH 2
-`endif
 
 `define REG_ENV_WIDTH 4
 `define REG_TL_WIDTH 6

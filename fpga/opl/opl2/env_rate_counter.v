@@ -1,7 +1,7 @@
 /*******************************************************************************
 #   +html+<pre>
 #
-#   FILENAME: env_rate_counter.sv
+#   FILENAME: opl2_env_rate_counter.sv
 #   AUTHOR: Greg Taylor     CREATION DATE: 2 Nov 2014
 #
 #   DESCRIPTION:
@@ -48,10 +48,9 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifndef OPL3
+`include "opl2.vh"
 
-module env_rate_counter (
+module opl2_env_rate_counter (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
@@ -113,5 +112,4 @@ module env_rate_counter (
         rate_counter_overflow = overflow_tmp >> 15;
     
 endmodule
-`endif
 

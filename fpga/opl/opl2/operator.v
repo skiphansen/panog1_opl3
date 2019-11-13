@@ -48,10 +48,9 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifndef OPL3
+`include "opl2.vh"
 
-module operator (
+module opl2_operator (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
@@ -225,7 +224,7 @@ module operator (
         .phase_inc(phase_inc)
     ); 
     
-    envelope_generator envelope_generator (
+    opl2_envelope_generator envelope_generator (
         .clk(clk),
         .reset(reset),
         .sample_clk_en(sample_clk_en),
@@ -252,7 +251,7 @@ module operator (
      * An operator that implements feedback does not take any modulation
      * input (it is always operator 1 in any channel scheme)
      */             
-    phase_generator phase_generator (
+    opl2_phase_generator phase_generator (
         .clk(clk),
         .reset(reset),
         .sample_clk_en(sample_clk_en),
@@ -266,5 +265,4 @@ module operator (
         .out(out)
     );
 endmodule
-`endif
 

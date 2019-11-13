@@ -1,12 +1,14 @@
 `timescale 1ns / 1ps
 `default_nettype none
 //////////////////////////////////////////////////////////////////////////////////
-// pano_midibox_fm top level 
+// panog1_opl3 top level 
 // Copyright (C) 2019  Skip Hansen
 //
 // This file is derived from Verilogboy project:
 // Copyright (C) 2019  Wenting Zhang <zephray@outlook.com>
 ////////////////////////////////////////////////////////////////////////////////
+
+`define OPL3 1
 
 module pano_top(
     // Global Clock Input
@@ -342,7 +344,7 @@ module pano_top(
     // Memory Map
     // 03000000 - 03000100 GPIO          See description below
     // 03000100 - 03000100 UART          (4B)
-    // 03000400 - 030007ff OPL2          (1K)
+    // 03000400 - 03000fff OPL2/OPL3     (2K)
     // 04000000 - 04080000 USB           (512KB)
     // 08000000 - 08000FFF Video RAM     (4KB)
     // 0C000000 - 0DFFFFFF LPDDR SDRAM   (32MB)
@@ -362,7 +364,7 @@ module pano_top(
     
     wire la_addr_in_gpio = (mem_la_addr >= 32'h03000000) && (mem_la_addr < 32'h03000100);
     wire la_addr_in_uart = (mem_la_addr == 32'h03000100);
-    wire la_addr_in_opl3 = (mem_la_addr >= 32'h03000400) && (mem_la_addr < 32'h03000800);
+    wire la_addr_in_opl3 = (mem_la_addr >= 32'h03000400) && (mem_la_addr < 32'h03001000);
     wire la_addr_in_usb = (mem_la_addr >= 32'h04000000) && (mem_la_addr < 32'h04080000);
     wire la_addr_in_vram = (mem_la_addr >= 32'h08000000) && (mem_la_addr < 32'h08004000);
     wire la_addr_in_ddr = (mem_la_addr >= 32'h0C000000) && (mem_la_addr < 32'h0E000000);
@@ -464,9 +466,30 @@ module pano_top(
         
     wire signed [15:0] opl2_channel_a;
     wire signed [15:0] opl2_channel_b;
+`ifdef OPL3
+    wire signed [15:0] opl2_channel_c;
+    wire signed [15:0] opl2_channel_d;
+`endif
     wire opl3_sample_clk;
     wire audio_bclk;
-            
+
+`ifdef OPL3
+    // OPL3
+    opl3 opl3(
+      .clk(clk_100),
+      .clk_opl3(clk_25),
+      .reset(!rst_rv_),
+      .opl3_we(opl3_valid),
+      .opl3_data(mem_wdata[7:0]),
+      .opl3_adr(mem_addr[10:2]),
+      .channel_a(opl2_channel_a),
+      .channel_b(opl2_channel_b),
+      .channel_c(opl2_channel_c),
+      .channel_d(opl2_channel_d),
+      .sample_clk(opl3_sample_clk),
+      .sample_clk_128(audio_bclk)
+    );
+`else
     // OPL2
     opl2 opl2(
       .clk(clk_100),
@@ -481,6 +504,7 @@ module pano_top(
       .sample_clk(opl3_sample_clk),
       .sample_clk_128(audio_bclk)
     );
+`endif
 
     // Internal RAM & Boot ROM
     wire [31:0] ram_rdata;
@@ -676,10 +700,16 @@ module pano_top(
     wire signed [18:0] left_pre, right_pre;
     wire signed [15:0] left, right;
 
+`ifdef OPL3
+    assign left_pre = opl2_channel_a + opl2_channel_c;
+    assign right_pre = opl2_channel_b + opl2_channel_d;
+`else
     assign left_pre = opl2_channel_a<<<1;
+    assign right_pre = opl2_channel_b<<<1;
+`endif
+
     assign left = left_pre > 32767 ? 16'hffff : left_pre < -32768 ? 16'h0000 : left_pre[15:0];
 
-    assign right_pre = opl2_channel_b<<<1;
     assign right = right_pre > 32767 ? 16'hffff : right_pre < -32768 ? 16'h0000: right_pre[15:0];
 
 // Audio codec

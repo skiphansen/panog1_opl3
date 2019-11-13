@@ -50,9 +50,9 @@
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "opl2.vh"
 
-module calc_rhythm_phase (
+module opl2_calc_rhythm_phase (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,

@@ -48,8 +48,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifdef OPL3
+`include "opl3.vh"
 
 module operator (
     input wire clk,
@@ -271,5 +270,4 @@ module operator (
         .out(out)
     );
 endmodule
-`endif
 

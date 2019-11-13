@@ -1,14 +1,15 @@
 /*******************************************************************************
 #   +html+<pre>
 #
-#   FILENAME: vibrato.sv
+#   FILENAME: opl3_pkg.sv
 #   AUTHOR: Greg Taylor     CREATION DATE: 13 Oct 2014
 #
 #   DESCRIPTION:
-#   Prepare the phase increment for the NCO (calc multiplier and vibrato)
+#   Generates a clk enable pulse based on the frequency specified by
+#   OUTPUT_CLK_EN_FREQ.
 #
 #   CHANGE HISTORY:
-#   13 Oct 2014    Greg Taylor
+#   13 Oct 2014        Greg Taylor
 #       Initial version
 #
 #   Copyright (C) 2014 Greg Taylor <gtaylor@sonic.net>
@@ -21,7 +22,7 @@
 #   (at your option) any later version.
 #   
 #   OPL3 FPGA is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   but WITHOUT ANY WARRANTY without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU Lesser General Public License for more details.
 #   
@@ -41,48 +42,13 @@
 #******************************************************************************/
 
 /******************************************************************************
-#
-# Converted from systemVerilog to Verilog
-# Copyright (C) 2018 Magnus Karlsson <magnus@saanlima.com>
-#
+# converted from systemVerilog to Verilog by Magnus Karlsson
 *******************************************************************************/
 
-`timescale 1ns / 1ps
+`include "../opl.vh"
+`define REG_TIMER_WIDTH 8
+`define REG_CONNECTION_SEL_WIDTH 6
+`define REG_WS_WIDTH 3
+`define NUM_BANKS 2
+`define BANK_NUM_WIDTH 1
 
-`include "opl.vh"
-
-module vibrato (
-    input wire clk,
-    input wire reset,
-    input wire sample_clk_en,   
-    input wire [`REG_FNUM_WIDTH-1:0] fnum,
-    input wire dvb,    
-    output reg [`REG_FNUM_WIDTH-1:0] vib_val
-);
-    localparam VIBRATO_INDEX_WIDTH = 13;
-    
-    reg [VIBRATO_INDEX_WIDTH-1:0] vibrato_index = 0;
-    wire [`REG_FNUM_WIDTH-1:0] delta0;
-    wire [`REG_FNUM_WIDTH-1:0] delta1;
-    wire [`REG_FNUM_WIDTH-1:0] delta2;
-        
-    /*
-     * Low-Frequency Oscillator (LFO)
-     * 6.07Hz (Sample Freq/2**13)
-     */        
-    always @(posedge clk)
-        if (reset)
-            vibrato_index <= 0;
-        else if (sample_clk_en)
-            vibrato_index <= vibrato_index + 1;
-        
-    assign delta0 = fnum >> 7;
-    assign delta1 = ((vibrato_index >> 10) & 3) == 3 ? delta0 >> 1 : delta0;
-    assign delta2 = !dvb ? delta1 >> 1 : delta1;
-    
-    always @(posedge clk)
-        if (reset)
-            vib_val <= 0;
-        else
-            vib_val <= ((vibrato_index >> 10) & 4) != 0 ? ~delta2 : delta2;
-endmodule

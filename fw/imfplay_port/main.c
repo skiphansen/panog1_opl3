@@ -98,7 +98,7 @@ void LogPutc(char c,void *arg)
    }
 }
 
-void Opl3WriteReg(uint8_t chip,uint8_t RegOffset,uint8_t Data)
+void Opl3WriteReg(uint8_t chip,uint16_t RegOffset,uint8_t Data)
 {
    volatile uint8_t *p;
 

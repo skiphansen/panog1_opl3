@@ -48,15 +48,15 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifdef OPL3
+`include "opl3.vh"
 
 module phase_generator (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
     input wire is_new,    
-    input wire [`BANK_NUM_WIDTH-1:0] bank_num,
+//    input wire [`BANK_NUM_WIDTH-1:0] bank_num,
+    input wire [0:0] bank_num,
     input wire [`OP_NUM_WIDTH-1:0] op_num,  
     input wire [`PHASE_ACC_WIDTH-1:0] phase_inc,
     input wire [`REG_WS_WIDTH-1:0] ws,
@@ -237,7 +237,6 @@ module phase_generator (
             default:      out <= tmp_out2 << 1;
             endcase      
 endmodule
-`endif
 
 
     

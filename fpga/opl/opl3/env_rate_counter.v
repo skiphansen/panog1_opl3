@@ -48,8 +48,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifdef OPL3
+`include "opl3.vh"
 
 module env_rate_counter (
     input wire clk,
@@ -106,6 +105,5 @@ module env_rate_counter (
         rate_counter_overflow = overflow_tmp >> 15;
     
 endmodule
-`endif
 
     

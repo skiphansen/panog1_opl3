@@ -49,7 +49,7 @@
 
 `timescale 1ns / 1ps
 
-`include "opl3.vh"
+`include "opl.vh"
 
 module ksl_add_rom # (
     parameter integer KSL_ADD_WIDTH = 8 // do not override

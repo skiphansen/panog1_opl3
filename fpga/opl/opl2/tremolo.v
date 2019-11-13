@@ -1,7 +1,7 @@
 /*******************************************************************************
 #   +html+<pre>
 #
-#   FILENAME: tremolo.sv
+#   FILENAME: opl2_tremolo.sv
 #   AUTHOR: Greg Taylor     CREATION DATE: 2 Nov 2014
 #
 #   DESCRIPTION:
@@ -48,15 +48,14 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifndef OPL3
+`include "opl2.vh"
 
-module tremolo (
+module opl2_tremolo (
     input wire clk,
     input wire reset,
     input wire sample_clk_en,
     input wire [`OP_NUM_WIDTH-1:0] op_num,            
-    input wire dam, // depth of tremolo
+    input wire dam, // depth of opl2_tremolo
     output reg [`AM_VAL_WIDTH-1:0] am_val
 );
     localparam TREMOLO_MAX_COUNT = 13*1024;
@@ -90,7 +89,4 @@ module tremolo (
         else
             am_val <= am_val_tmp1 >> 2;
 endmodule
-`endif
 
-
-    

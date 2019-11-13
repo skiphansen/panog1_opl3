@@ -50,8 +50,7 @@
 
 `timescale 1ns / 1ps
 
-`include "../opl3.vh"
-`ifdef OPL3
+`include "opl3.vh"
 
 module calc_rhythm_phase (
     input wire clk,
@@ -123,6 +122,5 @@ module calc_rhythm_phase (
             else
                 rand_num <= rand_num >> 1;  
 endmodule
-`endif
 
     
