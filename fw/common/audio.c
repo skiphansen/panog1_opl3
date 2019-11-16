@@ -4,7 +4,9 @@
 #include "audio.h"
 
 #include "i2c.h"
-#define DEBUG_LOGGING
+// #define DEBUG_LOGGING
+// #define VERBOSE_DEBUG_LOGGING
+// #define LOG_TO_BOTH
 #include "log.h"
 
 // The sampling rate for real opl3 is 14.31818 MHz/288 = 49715.2777.
@@ -20,6 +22,7 @@
 // use a sampling rate of 50 Khz (25 MHz/500) which is 57% faster than ideal.
 // MCLK and BCLK are 250fs (25 Mhz / 2).
 short int audio_registers[][2] = {
+    { WM8750_RESET_ADDR, 0},                        // Any write resets the chip
     { WM8750_LOUT1_VOL_ADDR,            (0<<8) |    // LO2VU    : Don't update LOUT1 volume yet
                                         (0<<7) |    // LO2ZC    : Change gain on zero cross only
                                      (0x78<<0) },   // LOUT2VOL : Volume...
@@ -67,7 +70,7 @@ short int audio_registers[][2] = {
     // Various...
     { WM8750_ADDITIONAL_CTRL1_ADDR,     (1<<8) |    // TSDEN   : Thermal shutdown enabled
                                         (3<<6) |    // VSEL    : Analog bias current optimized for 3.3V
-                                        (3<<4) |    // DMONOMIX: mono goes to both DACL and DACR
+                                        (0<<4) |    // DMONOMIX: stereo mode
                                         (0<<2) |    // DATSEL  : left data=left ADC, right data=right ADC
                                         (0<<1) |    // DACINV  : DAC phase not inverted 
                                         (1<<0) },   // TOEN    : Time-out enable on ADC zero cross detection on gain change
@@ -111,19 +114,19 @@ short int audio_registers[][2] = {
                                         (0<<4) |    // LI2LOVOL: Irrelevant
                                         (0<<0) },   // LMIXSEL : Irrrelevan
 
-    { WM8750_LEFT_MIXER_CTRL2_ADDR,     (1<<8) |    // RD2LO   : Enable right DAC to left mixer
+    { WM8750_LEFT_MIXER_CTRL2_ADDR,     (0<<8) |    // RD2LO   : Disable right DAC to left mixer
                                         (0<<7) |    // RI2LO   : Disable RMIXSEL signal to left mixer
                                         (0<<4) },   // RI2LOVOL: Irrelevant
 
     // Left and right DAC output goes to right output mixer
-    { WM8750_RIGHT_MIXER_CTRL1_ADDR,    (1<<8) |    // RD2RO   : Enable right DAC to right mixer
-                                        (0<<7) |    // RI2RO   : Disable RMIXSEL signal to right mixer
-                                        (0<<4) |    // RI2ROVOL: Irrelevant
-                                        (0<<0) },   // RMIXSEL : Irrrelevan
-
-    { WM8750_RIGHT_MIXER_CTRL2_ADDR,    (1<<8) |    // LD2RO   : Enable left DAC to right mixer
+    { WM8750_RIGHT_MIXER_CTRL1_ADDR,    (0<<8) |    // LD2RO   : Disable left DAC to right mixer
                                         (0<<7) |    // LI2RO   : Disable LMIXSEL signal to right mixer
-                                        (0<<4) },   // LI2ROVOL: Irrelevant
+                                        (0<<4) |    // LI2ROVOL: Irrelevant
+                                        (0<<0) },   // RMIXSEL : Irrrelevan
+                                                    //
+    { WM8750_RIGHT_MIXER_CTRL2_ADDR,    (1<<8) |    // RD2RO   : Enable right DAC to right mixer
+                                        (0<<7) |    // RI2RO   : Disable RMIXSEL signal to right mixer
+                                        (0<<4)},    // RI2ROVOL: Irrelevant
 
 
     // Mono output isn't used
@@ -155,6 +158,7 @@ void audio_init()
         int addr  = audio_registers[idx][0];
         int value = audio_registers[idx][1];
 
+        VLOG("0x%x -> 0x%x\n",value,addr);
         if(!i2c_write_reg(CODEC_I2C_ADR, WM8750L_I2C_ADR, (addr<<1) | (value>>8), (value & 0xff))) {
             ELOG("i2c_write_reg failed\n");
            break;
