@@ -51,6 +51,10 @@ SECTIONS {
         _edata = .;        /* define a global symbol at data end; used by startup code in order to initialise the .data section in RAM */
     } >RAM
 
+  /* verify that the initialization data fits in FLASH */
+  ASSERT( (_sidata + (_edata - _sdata)) <= (ORIGIN(FLASH) + LENGTH(FLASH)),
+	 "RAM initialization data doesn't fit in flash")
+
     /* Uninitialized data section */
     .bss :
     {
