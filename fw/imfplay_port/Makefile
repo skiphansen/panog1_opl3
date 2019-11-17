@@ -13,16 +13,20 @@ MAIN_PRG := imfplay
 #DRO_FILE = opl3dro/doom2_003.dro
 #DRO_FILE = opl3dro/doom2_013.dro
 #DRO_FILE = opl3dro/doom2_014.dro
-#DRO_FILE = opl3dro/doom2_015.dro
+DRO_FILE = opl3dro/doom2_015.dro
 #DRO_FILE = opl3dro/doom2_016.dro
 #DRO_FILE = opl3dro/doom2_031.dro
-DRO_FILE = opl3dro/doom2_032.dro
+#DRO_FILE = opl3dro/doom2_032.dro
+#DRO_FILE = opl3dro/xcom_001.dro
 
 # these don't work (opl3 support needed?)
-#DRO_FILE = opl3dro/war_000.dro
-#DRO_FILE = opl3dro/atlantis_000.dro
+
+#OPL3 files
+#DRO_FILE = opl3dro/war_000.dro #(doesn't fit in flash, plays if truncated manually
+#DRO_FILE = opl3dro/atlantis_000.dro #(doesn't fit in flash)
 #DRO_FILE = opl3dro/dott_000.dro
-#DRO_FILE = opl3dro/xcom_001.dro
+
+# opl2 file?
 
 CFLAGS = -I../include -MD -O1 -march=rv32i -ffreestanding -nostdlib 
 VPATH = ../common

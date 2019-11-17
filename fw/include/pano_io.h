@@ -61,7 +61,7 @@
 #define OPL3_STATUS_OVFL   0x00000002
 
 #define UART_ADR           0x03000100
-#define OPL3_ADR           0x03000400
+#define OPL3_ADR           0x03000800
 #define VRAM_ADR           0x08000000
 #define DDR_ADR            0x0C000000
 #define DDR_TOTAL          0x2000000 // 32 MB

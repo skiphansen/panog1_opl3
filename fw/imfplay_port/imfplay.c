@@ -73,7 +73,7 @@ long freq_div;
 long last_slow_tick;
 const int opl2_base = 0x388;
 long time_ctr;
-unsigned char shadow_opl[256];
+unsigned char shadow_opl[512];
 unsigned char shadow_opl_written[256];
 unsigned char mutemask[9];
 unsigned short dro1_high;
@@ -111,19 +111,19 @@ void opl2_out(unsigned char reg, unsigned char data, unsigned char bank)
 
    VLOG("bank %d, reg 0x%02x, data 0x%02x\n",bank,reg,data);
 
+#if 0
    /*
     * Write 8-bit value using 32-bit read/modify/write. Only 32-bit
     * word-aligned addresses are available (0, 4, 8, etc).
     */
-#if 0
    actual_data.int_value = OPL3_FPGA_mReadReg(XPAR_OPL3_FPGA_0_S_AXI_BASEADDR, actual_reg);
    actual_data.char_array[reg%4] = data;
    OPL3_FPGA_mWriteReg(XPAR_OPL3_FPGA_0_S_AXI_BASEADDR, actual_reg, actual_data.int_value);
 #else
-   Opl3WriteReg(0,reg,data);
+   Opl3WriteReg(0,reg + (bank<<8),data);
 #endif
 
-   shadow_opl[reg] = data;
+   shadow_opl[reg + (bank<<8)] = data;
 }
 
 void opl2_clear(void)

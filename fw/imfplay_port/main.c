@@ -4,12 +4,12 @@
 #include "printf.h"
 #include "audio.h"
 
-// #define DEBUG_LOGGING
+#define DEBUG_LOGGING
 // #define VERBOSE_DEBUG_LOGGING
 #define LOG_TO_BOTH
 #include "log.h"
 
-// #define SIN_TEST
+#define SIN_TEST
 
 uint8_t gCrtRow = 3;
 uint8_t gCrtCol;
@@ -34,6 +34,7 @@ void main()
    SinTest();
    CaptureData();
 #else
+
    ALOG("Calling imfplay\n");
    ALOG("imfplay returned %d\n",imfplay("dummy"));
    ALOG("%d samples captured\n",Index);
@@ -107,54 +108,117 @@ void Opl3WriteReg(uint8_t chip,uint16_t RegOffset,uint8_t Data)
    *p = Data;
 }
 
+const uint8_t OpOffset[] = {
+   0x0,0x1,0x2,0x3,0x4,0x5,
+   0x8,0x9,0xa,0xb,0xc,0xd,
+   0x10,0x11,0x12,0x13,0x14,0x15
+};
+
+#define NUM_OPS_PER_BANK   18
+#define NUM_BANKS          2
+#define REG_ADR(x,y)       ((x << 8) + y)
+
+#define BANK   0
 // initialize OPL3 registers for a 1kHz sine wave
 struct {
+   uint8_t Bank;
    uint8_t Reg;
    uint8_t Value;
 } InitData[] = {
-   {0x20, 0x21 }, // OP1 Control Flags/Multiplier
-   {0x23, 0x21 }, // OP2 Control Flags/Multiplier
-   {0x28, 0x21 }, // OP3 Control Flags/Multiplier
-   {0x2b, 0x21 }, // OP4 Control Flags/Multiplier
+//    {1, 0x05, 0x01 }, // enable OPL3 mode
 
-   {0x40, 0x00 }, // OP1 KSL/TL
-   {0x43, 0x3f }, // OP2 KSL/TL (muted)
-   {0x48, 0x3f }, // OP3 KSL/TL (muted)
-   {0x4b, 0x3f }, // OP4 KSL/TL (muted)
+   {BANK,  0x20, 0x21 }, // OP1 Control Flags/Multiplier
+   {BANK,  0x23, 0x21 }, // OP2 Control Flags/Multiplier
+   {BANK,  0x28, 0x21 }, // OP3 Control Flags/Multiplier
+   {BANK,  0x2b, 0x21 }, // OP4 Control Flags/Multiplier
 
-   {0x60, 0x88 }, // OP1 AR/DR
-   {0x63, 0x88 }, // OP2 AR/DR
-   {0x68, 0x88 }, // OP3 AR/DR
-   {0x6b, 0x88 }, // OP4 AR/DR
+   {BANK,  0x40, 0x08 }, // OP1 KSL/TL
+#if 0                         //
+   {BANK,  0x43, 0x3f }, // OP2 KSL/TL (muted)
+   {BANK,  0x48, 0x3f }, // OP3 KSL/TL (muted)
+   {BANK,  0x4b, 0x3f }, // OP4 KSL/TL (muted)
+#endif
 
-   {0x80, 0x00 }, // OP1 SL/RR
-   {0x83, 0x00 }, // OP2 SL/RR
-   {0x88, 0x00 }, // OP3 SL/RR
-   {0x8b, 0x00 }, // OP4 SL/RR
+   {BANK,  0x60, 0x88 }, // OP1 AR/DR
+   {BANK,  0x63, 0x88 }, // OP2 AR/DR
+   {BANK,  0x68, 0x88 }, // OP3 AR/DR
+   {BANK,  0x6b, 0x88 }, // OP4 AR/DR
 
-   {0xe0, 0x00 }, // OP1 Waveform
-   {0xe3, 0x00 }, // OP2 Waveform
-   {0xe8, 0x00 }, // OP3 Waveform
-   {0xeb, 0x00 }, // OP4 Waveform
+   {BANK,  0x80, 0x00 }, // OP1 SL/RR
+   {BANK,  0x83, 0x00 }, // OP2 SL/RR
+   {BANK,  0x88, 0x00 }, // OP3 SL/RR
+   {BANK,  0x8b, 0x00 }, // OP4 SL/RR
 
-   {0xc0, 0xf1 }, // Channels/Connections/Feedback
-   {0xc3, 0xf0 }, // Channels/Connections/Feedback
+   {BANK,  0xe0, 0x00 }, // OP1 Waveform
+   {BANK,  0xe3, 0x00 }, // OP2 Waveform
+   {BANK,  0xe8, 0x00 }, // OP3 Waveform
+   {BANK,  0xeb, 0x00 }, // OP4 Waveform
 
-   {0xa0, 0xa4 }, // FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
-   {0xb0, 0x3c }, // KON/Block/FNUM_H
-   {0}            // end of table
+   {BANK,  0xc0, 0x01 }, // Channels/Connections/Feedback
+   {BANK,  0xc3, 0x00 }, // Channels/Connections/Feedback
+
+// FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+
+   {BANK,  0xa0, 0xa4 }, // FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+   {BANK,  0xb0, 0x3c }, // KON/Block/FNUM_H
+
+#if 0
+#undef BANK
+#define BANK   1
+
+   {BANK,  0x20, 0x21 }, // OP1 Control Flags/Multiplier
+   {BANK,  0x23, 0x21 }, // OP2 Control Flags/Multiplier
+   {BANK,  0x28, 0x21 }, // OP3 Control Flags/Multiplier
+   {BANK,  0x2b, 0x21 }, // OP4 Control Flags/Multiplier
+
+   {BANK,  0x40, 0x00 }, // OP1 KSL/TL
+   {BANK,  0x43, 0x3f }, // OP2 KSL/TL (muted)
+   {BANK,  0x48, 0x3f }, // OP3 KSL/TL (muted)
+   {BANK,  0x4b, 0x3f }, // OP4 KSL/TL (muted)
+
+   {BANK,  0x60, 0x88 }, // OP1 AR/DR
+   {BANK,  0x63, 0x88 }, // OP2 AR/DR
+   {BANK,  0x68, 0x88 }, // OP3 AR/DR
+   {BANK,  0x6b, 0x88 }, // OP4 AR/DR
+
+   {BANK,  0x80, 0x00 }, // OP1 SL/RR
+   {BANK,  0x83, 0x00 }, // OP2 SL/RR
+   {BANK,  0x88, 0x00 }, // OP3 SL/RR
+   {BANK,  0x8b, 0x00 }, // OP4 SL/RR
+
+   {BANK,  0xe0, 0x00 }, // OP1 Waveform
+   {BANK,  0xe3, 0x00 }, // OP2 Waveform
+   {BANK,  0xe8, 0x00 }, // OP3 Waveform
+   {BANK,  0xeb, 0x00 }, // OP4 Waveform
+
+   {BANK,  0xc0, 0x31 }, // Channels/Connections/Feedback
+   {BANK,  0xc3, 0x30 }, // Channels/Connections/Feedback
+
+// FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+
+   {BANK,  0xa0, 0xa4 }, // FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
+   {BANK,  0xb0, 0x38 }, // KON/Block/FNUM_H
+#endif
+   {0xff}   // end of table
 };
 
 void SinTest()
 {
    int i;
+   int j;
 
-   for(i = 0; InitData[i].Reg != 0; i++) {
-      Opl3WriteReg(0,InitData[i].Reg,InitData[i].Value);
+   for(i = 0; i < NUM_BANKS; i++) {
+      for(j = 0; j < NUM_OPS_PER_BANK; j++) {
+         Opl3WriteReg(0,REG_ADR(i,0x40+OpOffset[j]),0x3f);   // KSL/TL (muted)
+      }
+   }
+
+   for(i = 0; InitData[i].Bank != 0xff; i++) {
+      Opl3WriteReg(0,InitData[i].Reg + (InitData[i].Bank << 8) ,InitData[i].Value);
    }
 }
 
-#define CAPTURE_BUF_LEN 7000000
+#define CAPTURE_BUF_LEN 1000
 uint32_t CaptureBuf[CAPTURE_BUF_LEN];
 
 void CaptureData()
@@ -162,7 +226,8 @@ void CaptureData()
    int i;
    uint32_t Status;
    int Captured;
-   int16_t Sample;
+   int16_t Sample1;
+   int16_t Sample2;
 
 
    for(i = 0; i < CAPTURE_BUF_LEN; i++) {
@@ -197,11 +262,18 @@ void CaptureData()
    LOG("\nCaptured %d samples\n",Captured);
 
    for(i = 0; i < Captured; i++) {
+#if 0
       if((i & 0x7) == 0) {
          LOG_R("\n");
       }
-      Sample = (int16_t) (CaptureBuf[i] & 0xffff);
-      LOG_R("%d,",Sample);
+#endif
+#if 1
+      Sample1 = (int16_t) (CaptureBuf[i] & 0xffff);
+      Sample2 = (int16_t) ((CaptureBuf[i] >> 16) & 0xffff);
+      LOG_R("%d,%d\n",Sample1,Sample2);
+#else
+      LOG_R("0x%x,",CaptureBuf[i]);
+#endif
    }
 }
 
@@ -240,3 +312,12 @@ void TimerDelay(uint32_t us)
    while ((ticks() - start) < (CYCLE_PER_US * us));
 }
 #endif
+
+void irq_handler(uint32_t pc) 
+{
+   // External logic is required to connect fault signal to IRQ line,
+   // and ENABLE_IRQ_QREGS should be turned off.
+   ELOG("\nHARD FAULT PC = 0x%x\n",pc);
+   while(1);
+}
+

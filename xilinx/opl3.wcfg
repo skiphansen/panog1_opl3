@@ -10,18 +10,10 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="25" />
+   <WVObjectSize size="103" />
    <wave_markers>
       <marker time="41165000000" label="" />
    </wave_markers>
-   <wvobject fp_name="/test/DUT/opl2/clk" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/OPL2_clk" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">OPL2_clk</obj_property>
-      <obj_property name="ObjectShortName">OPL2_clk</obj_property>
-   </wvobject>
    <wvobject fp_name="/test/DUT/PB" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">PB</obj_property>
       <obj_property name="ObjectShortName">PB</obj_property>
@@ -46,28 +38,6 @@
       <obj_property name="ElementShortName">mem_rdata[31:0]</obj_property>
       <obj_property name="ObjectShortName">mem_rdata[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/opl2_we" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">opl2_we</obj_property>
-      <obj_property name="ObjectShortName">opl2_we</obj_property>
-   </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/opl2_adr" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">opl2_adr[7:0]</obj_property>
-      <obj_property name="ObjectShortName">opl2_adr[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/opl2_data" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">opl2_data[7:0]</obj_property>
-      <obj_property name="ObjectShortName">opl2_data[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/reset" type="logic" db_ref_id="1">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">reset</obj_property>
-      <obj_property name="ObjectShortName">reset</obj_property>
-      <obj_property name="label">opl2_reset</obj_property>
-   </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/channel_a" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">channel_a[15:0]</obj_property>
-      <obj_property name="ObjectShortName">channel_a[15:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/test/DUT/opl2_channel_a" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">opl2_channel_a[15:0]</obj_property>
       <obj_property name="ObjectShortName">opl2_channel_a[15:0]</obj_property>
@@ -88,18 +58,9 @@
       <obj_property name="ElementShortName">last_bclk</obj_property>
       <obj_property name="ObjectShortName">last_bclk</obj_property>
    </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/sample_clk" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">sample_clk</obj_property>
-      <obj_property name="ObjectShortName">sample_clk</obj_property>
-   </wvobject>
    <wvobject fp_name="/test/DUT/codec_interface/audio_daclrc" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">audio_daclrc</obj_property>
       <obj_property name="ObjectShortName">audio_daclrc</obj_property>
-   </wvobject>
-   <wvobject fp_name="/test/DUT/opl2/cntr" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">cntr[8:0]</obj_property>
-      <obj_property name="ObjectShortName">cntr[8:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/test/DUT/codec_interface/bit_cntr" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">bit_cntr[5:0]</obj_property>
@@ -116,5 +77,353 @@
    <wvobject fp_name="/test/DUT/codec_interface/start_cycle" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">start_cycle</obj_property>
       <obj_property name="ObjectShortName">start_cycle</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/opl3_we" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">opl3_we</obj_property>
+      <obj_property name="ObjectShortName">opl3_we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/opl3_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl3_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">opl3_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/opl3_adr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl3_adr[8:0]</obj_property>
+      <obj_property name="ObjectShortName">opl3_adr[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_a[15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_a[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_b" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_b[15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_b[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/clk_opl3" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk_opl3</obj_property>
+      <obj_property name="ObjectShortName">clk_opl3</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/opl3_we" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">opl3_we</obj_property>
+      <obj_property name="ObjectShortName">opl3_we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/opl3_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl3_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">opl3_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/opl3_adr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl3_adr[8:0]</obj_property>
+      <obj_property name="ObjectShortName">opl3_adr[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/bank_num" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">bank_num[1:0]</obj_property>
+      <obj_property name="ObjectShortName">bank_num[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/operator_out_tmp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">operator_out_tmp[12:0]</obj_property>
+      <obj_property name="ObjectShortName">operator_out_tmp[12:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/latch_feedback_pulse" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">latch_feedback_pulse</obj_property>
+      <obj_property name="ObjectShortName">latch_feedback_pulse</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_a" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_a[15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_a[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_b" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_b[15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_b[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_c" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_c[15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_c[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_d" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_d[15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_d[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/sample_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sample_clk</obj_property>
+      <obj_property name="ObjectShortName">sample_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/sample_clk_128" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sample_clk_128</obj_property>
+      <obj_property name="ObjectShortName">sample_clk_128</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/opl3_reg" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">opl3_reg[511:0,7:0]</obj_property>
+      <obj_property name="ObjectShortName">opl3_reg[511:0,7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/cntr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cntr[8:0]</obj_property>
+      <obj_property name="ObjectShortName">cntr[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/sample_clk_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sample_clk_en</obj_property>
+      <obj_property name="ObjectShortName">sample_clk_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/nts" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">nts</obj_property>
+      <obj_property name="ObjectShortName">nts</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/am" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">am[1:0,17:0]</obj_property>
+      <obj_property name="ObjectShortName">am[1:0,17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/vib" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">vib[1:0,17:0]</obj_property>
+      <obj_property name="ObjectShortName">vib[1:0,17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/egt" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">egt[1:0,17:0]</obj_property>
+      <obj_property name="ObjectShortName">egt[1:0,17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/ksr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ksr[1:0,17:0]</obj_property>
+      <obj_property name="ObjectShortName">ksr[1:0,17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/mult" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">mult[1:0,17:0,3:0]</obj_property>
+      <obj_property name="ObjectShortName">mult[1:0,17:0,3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/ksl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ksl[1:0,17:0,1:0]</obj_property>
+      <obj_property name="ObjectShortName">ksl[1:0,17:0,1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/tl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">tl[1:0,17:0,5:0]</obj_property>
+      <obj_property name="ObjectShortName">tl[1:0,17:0,5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/ar" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ar[1:0,17:0,3:0]</obj_property>
+      <obj_property name="ObjectShortName">ar[1:0,17:0,3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/dr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">dr[1:0,17:0,3:0]</obj_property>
+      <obj_property name="ObjectShortName">dr[1:0,17:0,3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/sl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">sl[1:0,17:0,3:0]</obj_property>
+      <obj_property name="ObjectShortName">sl[1:0,17:0,3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/rr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">rr[1:0,17:0,3:0]</obj_property>
+      <obj_property name="ObjectShortName">rr[1:0,17:0,3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/fnum" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">fnum[1:0,8:0,9:0]</obj_property>
+      <obj_property name="ObjectShortName">fnum[1:0,8:0,9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/kon" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">kon[1:0,8:0]</obj_property>
+      <obj_property name="ObjectShortName">kon[1:0,8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/block" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">block[1:0,8:0,2:0]</obj_property>
+      <obj_property name="ObjectShortName">block[1:0,8:0,2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/dam" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">dam</obj_property>
+      <obj_property name="ObjectShortName">dam</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/dvb" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">dvb</obj_property>
+      <obj_property name="ObjectShortName">dvb</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/ryt" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ryt</obj_property>
+      <obj_property name="ObjectShortName">ryt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/bd" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">bd</obj_property>
+      <obj_property name="ObjectShortName">bd</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/sd" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sd</obj_property>
+      <obj_property name="ObjectShortName">sd</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/tom" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">tom</obj_property>
+      <obj_property name="ObjectShortName">tom</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/tc" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">tc</obj_property>
+      <obj_property name="ObjectShortName">tc</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/hh" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">hh</obj_property>
+      <obj_property name="ObjectShortName">hh</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/chd" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">chd[1:0,8:0]</obj_property>
+      <obj_property name="ObjectShortName">chd[1:0,8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/chc" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">chc[1:0,8:0]</obj_property>
+      <obj_property name="ObjectShortName">chc[1:0,8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/chb" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">chb[1:0,8:0]</obj_property>
+      <obj_property name="ObjectShortName">chb[1:0,8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/cha" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cha[1:0,8:0]</obj_property>
+      <obj_property name="ObjectShortName">cha[1:0,8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/fb" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">fb[1:0,8:0,2:0]</obj_property>
+      <obj_property name="ObjectShortName">fb[1:0,8:0,2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/cnt" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">cnt[1:0,8:0]</obj_property>
+      <obj_property name="ObjectShortName">cnt[1:0,8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/ws" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ws[1:0,17:0,2:0]</obj_property>
+      <obj_property name="ObjectShortName">ws[1:0,17:0,2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/connection_sel" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">connection_sel[5:0]</obj_property>
+      <obj_property name="ObjectShortName">connection_sel[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/is_new" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">is_new</obj_property>
+      <obj_property name="ObjectShortName">is_new</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/fnum_tmp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">fnum_tmp[1:0,17:0,9:0]</obj_property>
+      <obj_property name="ObjectShortName">fnum_tmp[1:0,17:0,9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/block_tmp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">block_tmp[1:0,17:0,2:0]</obj_property>
+      <obj_property name="ObjectShortName">block_tmp[1:0,17:0,2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/fb_tmp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">fb_tmp[1:0,17:0,2:0]</obj_property>
+      <obj_property name="ObjectShortName">fb_tmp[1:0,17:0,2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/op_type_tmp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">op_type_tmp[1:0,17:0,2:0]</obj_property>
+      <obj_property name="ObjectShortName">op_type_tmp[1:0,17:0,2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/kon_tmp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">kon_tmp[1:0,17:0]</obj_property>
+      <obj_property name="ObjectShortName">kon_tmp[1:0,17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/use_feedback" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">use_feedback[1:0,17:0]</obj_property>
+      <obj_property name="ObjectShortName">use_feedback[1:0,17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/modulation" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">modulation[1:0,17:0,12:0]</obj_property>
+      <obj_property name="ObjectShortName">modulation[1:0,17:0,12:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/delay_counter" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">delay_counter[2:0]</obj_property>
+      <obj_property name="ObjectShortName">delay_counter[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/delay_state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">delay_state[5:0]</obj_property>
+      <obj_property name="ObjectShortName">delay_state[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/next_delay_state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">next_delay_state[5:0]</obj_property>
+      <obj_property name="ObjectShortName">next_delay_state[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/op_num" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">op_num[4:0]</obj_property>
+      <obj_property name="ObjectShortName">op_num[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/operator_out" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">operator_out[1:0,17:0,12:0]</obj_property>
+      <obj_property name="ObjectShortName">operator_out[1:0,17:0,12:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/calc_state" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">calc_state</obj_property>
+      <obj_property name="ObjectShortName">calc_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/next_calc_state" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">next_calc_state</obj_property>
+      <obj_property name="ObjectShortName">next_calc_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel[3:0]</obj_property>
+      <obj_property name="ObjectShortName">channel[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/bank" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">bank</obj_property>
+      <obj_property name="ObjectShortName">bank</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_2_op" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_2_op[1:0,8:0,15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_2_op[1:0,8:0,15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_4_op" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_4_op[1:0,2:0,15:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_4_op[1:0,2:0,15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_a_acc_pre_clamp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_a_acc_pre_clamp[18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_a_acc_pre_clamp[18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_a_acc_pre_clamp_p" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_a_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_a_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_b_acc_pre_clamp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_b_acc_pre_clamp[18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_b_acc_pre_clamp[18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_b_acc_pre_clamp_p" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_b_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_b_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_c_acc_pre_clamp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_c_acc_pre_clamp[18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_c_acc_pre_clamp[18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_c_acc_pre_clamp_p" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_c_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_c_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_d_acc_pre_clamp" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_d_acc_pre_clamp[18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_d_acc_pre_clamp[18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/channel_d_acc_pre_clamp_p" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">channel_d_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+      <obj_property name="ObjectShortName">channel_d_acc_pre_clamp_p[1:0,8:0,18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/OPERATOR_PIPELINE_DELAY" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">OPERATOR_PIPELINE_DELAY[31:0]</obj_property>
+      <obj_property name="ObjectShortName">OPERATOR_PIPELINE_DELAY[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/NUM_OPERATOR_UPDATE_STATES" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">NUM_OPERATOR_UPDATE_STATES[31:0]</obj_property>
+      <obj_property name="ObjectShortName">NUM_OPERATOR_UPDATE_STATES[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/IDLE" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">IDLE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">IDLE[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/CALC_OUTPUTS" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">CALC_OUTPUTS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">CALC_OUTPUTS[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test/DUT/opl3/BANK2_OFFSET" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">BANK2_OFFSET[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BANK2_OFFSET[31:0]</obj_property>
    </wvobject>
 </wave_config>

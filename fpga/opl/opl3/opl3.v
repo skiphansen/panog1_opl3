@@ -232,7 +232,24 @@ module opl3(
   for (i = 0; i < 2; i = i + 1) begin: name1
     for (j = 0; j < 6; j = j + 1) begin: name2
       always @(posedge clk_opl3)
-        if (sample_clk_en) begin
+        if (reset) begin
+          am[i][j]   <= 1'b0;
+          vib[i][j]  <= 1'b0;
+          egt[i][j]  <= 1'b0;
+          ksr[i][j]  <= 1'b0;
+          mult[i][j] <= 4'd0;
+            
+          ksl[i][j] <= 2'd0;
+          tl[i][j]  <= 6'd0;
+            
+          ar[i][j] <= 4'd0;
+          dr[i][j] <= 4'd0;
+            
+          sl[i][j] <= 4'd0;
+          rr[i][j] <= 4'd0;
+            
+          ws[i][j] <= 2'd0;
+        end else if (sample_clk_en) begin
           am[i][j]   <= opl3_reg['h20+j+i*BANK2_OFFSET][7];
           vib[i][j]  <= opl3_reg['h20+j+i*BANK2_OFFSET][6];
           egt[i][j]  <= opl3_reg['h20+j+i*BANK2_OFFSET][5];
@@ -850,7 +867,9 @@ module opl3(
        * Capture output from operator in the last cycle of the time slot
        */
       always @(posedge clk_opl3)
-        if (i == bank_num && j == op_num &&
+        if (reset) 
+            operator_out[i][j] <= 0;
+        else if (i == bank_num && j == op_num &&
          delay_counter == OPERATOR_PIPELINE_DELAY - 1)
             operator_out[i][j] <= operator_out_tmp;
     end
@@ -882,11 +901,12 @@ module opl3(
   reg signed [`SAMPLE_WIDTH-1:0] channel_d = 0;
   
   always @(posedge clk_opl3)
-    if (reset)
+    if (reset) begin
       calc_state <= IDLE;
-    else
+    end else begin
       calc_state <= next_calc_state;
-    
+    end
+
   always @ (*)
     case (calc_state)
     IDLE: next_calc_state = sample_clk_en ? CALC_OUTPUTS : IDLE;
@@ -911,33 +931,48 @@ module opl3(
      * 2 operator channel output connections
      */
     always @ * begin
-      channel_2_op[i][0] = cnt[i][0] ? operator_out[i][0] + operator_out[i][3]
-       : operator_out[i][3];
-      channel_2_op[i][1] = cnt[i][1] ? operator_out[i][1] + operator_out[i][4]
-       : operator_out[i][4];
-      channel_2_op[i][2] = cnt[i][2] ? operator_out[i][2] + operator_out[i][5]
-       : operator_out[i][5];    
-      channel_2_op[i][3] = cnt[i][3] ? operator_out[i][6] + operator_out[i][9]
-       : operator_out[i][9];
-      channel_2_op[i][4] = cnt[i][4] ? operator_out[i][7] + operator_out[i][10]
-       : operator_out[i][10];
-      channel_2_op[i][5] = cnt[i][5] ? operator_out[i][8] + operator_out[i][11]
-       : operator_out[i][11];
+      if (reset) begin
+          channel_2_op[i][0] = 0;
+          channel_2_op[i][1] = 0;
+          channel_2_op[i][2] = 0;
+          channel_2_op[i][3] = 0;
+          channel_2_op[i][4] = 0;
+          channel_2_op[i][5] = 0;
+      end else begin
+          channel_2_op[i][0] = cnt[i][0] ? operator_out[i][0] + operator_out[i][3]
+           : operator_out[i][3];
+          channel_2_op[i][1] = cnt[i][1] ? operator_out[i][1] + operator_out[i][4]
+           : operator_out[i][4];
+          channel_2_op[i][2] = cnt[i][2] ? operator_out[i][2] + operator_out[i][5]
+           : operator_out[i][5];    
+          channel_2_op[i][3] = cnt[i][3] ? operator_out[i][6] + operator_out[i][9]
+           : operator_out[i][9];
+          channel_2_op[i][4] = cnt[i][4] ? operator_out[i][7] + operator_out[i][10]
+           : operator_out[i][10];
+          channel_2_op[i][5] = cnt[i][5] ? operator_out[i][8] + operator_out[i][11]
+           : operator_out[i][11];
+      end
     
-      if (ryt && i == 0)         
-        // bass drum is special (bank 0)
-        channel_2_op[i][6] = cnt[i][6] ? operator_out[i][15] : operator_out[i][12];
-    else
-        channel_2_op[i][6] = cnt[i][6] ? operator_out[i][12] + operator_out[i][15]
-         : operator_out[i][15];
-    
-      // aka hi hat and snare drum in bank 0
-      channel_2_op[i][7] = cnt[i][7] || (ryt && i == 0) ? operator_out[i][13] + operator_out[i][16]
-       : operator_out[i][16];   
-    
-      // aka tom tom and top cymbal in bank 0
-      channel_2_op[i][8] = cnt[i][8] || (ryt && i == 0)  ? operator_out[i][14] + operator_out[i][17]
-       : operator_out[i][17];
+      if (reset) begin
+          channel_2_op[i][6] = 0;
+          channel_2_op[i][7] = 0;
+          channel_2_op[i][8] = 0;
+      end else begin
+          if (ryt && i == 0)         
+            // bass drum is special (bank 0)
+            channel_2_op[i][6] = cnt[i][6] ? operator_out[i][15] : operator_out[i][12];
+           else
+            channel_2_op[i][6] = cnt[i][6] ? operator_out[i][12] + operator_out[i][15]
+             : operator_out[i][15];
+
+          // aka hi hat and snare drum in bank 0
+          channel_2_op[i][7] = cnt[i][7] || (ryt && i == 0) ? operator_out[i][13] + operator_out[i][16]
+           : operator_out[i][16];   
+        
+          // aka tom tom and top cymbal in bank 0
+          channel_2_op[i][8] = cnt[i][8] || (ryt && i == 0)  ? operator_out[i][14] + operator_out[i][17]
+           : operator_out[i][17];
+      end
     end
 
     /*
@@ -1023,7 +1058,7 @@ module opl3(
    * 16-bits.
    */
   always @(posedge clk_opl3)
-    if (sample_clk_en)
+    if (reset || sample_clk_en)
       channel_a_acc_pre_clamp <= 0;
     else if (calc_state == CALC_OUTPUTS)
       channel_a_acc_pre_clamp <= channel_a_acc_pre_clamp + channel_a_acc_pre_clamp_p[bank][channel];
@@ -1079,7 +1114,7 @@ module opl3(
   endgenerate
   
   always @(posedge clk_opl3)
-    if (sample_clk_en)
+    if (reset || sample_clk_en)
       channel_b_acc_pre_clamp <= 0;
     else if (calc_state == CALC_OUTPUTS)
       channel_b_acc_pre_clamp <= channel_b_acc_pre_clamp + channel_b_acc_pre_clamp_p[bank][channel];  
@@ -1135,7 +1170,7 @@ module opl3(
   endgenerate
   
   always @(posedge clk_opl3)
-    if (sample_clk_en)
+    if (reset || sample_clk_en)
       channel_c_acc_pre_clamp <= 0;
     else if (calc_state == CALC_OUTPUTS)
       channel_c_acc_pre_clamp <= channel_c_acc_pre_clamp + channel_c_acc_pre_clamp_p[bank][channel];  
@@ -1191,7 +1226,7 @@ module opl3(
   endgenerate
   
   always @(posedge clk_opl3)
-    if (sample_clk_en)
+    if (reset || sample_clk_en)
       channel_d_acc_pre_clamp <= 0;
     else if (calc_state == CALC_OUTPUTS)
       channel_d_acc_pre_clamp <= channel_d_acc_pre_clamp + channel_d_acc_pre_clamp_p[bank][channel];  

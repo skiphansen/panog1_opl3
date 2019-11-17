@@ -1,5 +1,7 @@
 `timescale 1 ns/1 ps
 
+`define OPL3 1
+
 module test;
     reg tb_clk;
     reg tb_reset;
@@ -79,7 +81,12 @@ module pano_top_tb (
     wire [31:0] mem_wdata;
     wire signed [15:0] opl2_channel_a;
     wire signed [15:0] opl2_channel_b;
+`ifdef OPL3
+    wire signed [15:0] opl2_channel_c;
+    wire signed [15:0] opl2_channel_d;
+`endif
     wire opl3_sample_clk;
+    wire audio_bclk;
 
     // ----------------------------------------------------------------------
     
@@ -87,7 +94,7 @@ module pano_top_tb (
     
     // Memory Map
     // 03000000 - 03000100 GPIO          See description below
-    // 03000400 - 030007ff OPL2          (1K)
+    // 03000800 - 03000fff OPL2/OPL3     (2K)
     // 0E000000 - 0E000fff Internal RAM  (4KB w/ echo)
     parameter integer MEM_WORDS = 1024;
     parameter [31:0] STACKADDR = 32'h0e000ff0;
@@ -103,7 +110,7 @@ module pano_top_tb (
     reg cpu_irq;
     
     wire la_addr_in_gpio = (mem_la_addr >= 32'h03000000) && (mem_la_addr < 32'h03000100);
-    wire la_addr_in_opl3 = (mem_la_addr >= 32'h03000400) && (mem_la_addr < 32'h03000800);
+    wire la_addr_in_opl3 = (mem_la_addr >= 32'h03000800) && (mem_la_addr < 32'h03000fff);
     wire la_addr_in_ram = (mem_la_addr >= 32'h0E000000) && (mem_la_addr < 32'h0E001000);
     
     reg addr_in_ram;
@@ -231,6 +238,23 @@ module pano_top_tb (
     );
     wire bclk;
 
+    `ifdef OPL3
+        // OPL3
+        opl3 opl3(
+          .clk(clk_100),
+          .clk_opl3(clk_25),
+          .reset(!rst_rv_),
+          .opl3_we(opl3_valid),
+          .opl3_data(mem_wdata[7:0]),
+          .opl3_adr(mem_addr[10:2]),
+          .channel_a(opl2_channel_a),
+          .channel_b(opl2_channel_b),
+          .channel_c(opl2_channel_c),
+          .channel_d(opl2_channel_d),
+          .sample_clk(opl3_sample_clk),
+          .sample_clk_128(audio_bclk)
+        );
+`else
     // OPL2
     opl2 opl2(
       .clk(clk_100),
@@ -245,6 +269,7 @@ module pano_top_tb (
       .sample_clk(opl3_sample_clk),
       .sample_clk_128(bclk)
     );
+    `endif
 
     // Internal RAM & Boot ROM
     wire [31:0] ram_rdata;
@@ -268,7 +293,7 @@ module pano_top_tb (
     audio codec_interface (
         .clk25(clk_25),
         .reset25(!rst_rv_),
-        .audio_bclk(bclk),
+        .audio_bclk(audio_bclk),
         .audio_dacdat(AUDIO_DACDATA),
         .audio_daclrc(AUDIO_DACLRCK),
         .audio_adcdat(AUDIO_ADCDATA),

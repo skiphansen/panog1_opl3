@@ -32,8 +32,8 @@ struct {
    {0xe8, 0x00 }, // OP3 Waveform
    {0xeb, 0x00 }, // OP4 Waveform
 
-   {0xc0, 0xf1 }, // Channels/Connections/Feedback
-   {0xc3, 0xf0 }, // Channels/Connections/Feedback
+   {0xc0, 0x11 }, // Channels/Connections/Feedback
+   {0xc3, 0x00 }, // Channels/Connections/Feedback
 
    {0xa0, 0xa4 }, // FNUM        $freq = ($fnum / (1 << (20-$block))) * 49715.0;
    {0xb0, 0x3c }, // KON/Block/FNUM_H

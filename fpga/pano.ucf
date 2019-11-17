@@ -145,8 +145,10 @@ NET "VGA_BLANK_B" LOC = A8  |IOSTANDARD = LVCMOS18;  # BLANK_
                                                     # SYNC_T = 10k R to ?
                                                     # M1 = 10 pulldown to GND
                                                     # M2 = 10 pulldown to GND
+
 NET "VGA_SCL"  LOC = D4  |IOSTANDARD = LVCMOS33;
-NET "VGA_SDA"  LOC = G3  |IOSTANDARD = LVCMOS33;
+#NET "VGA_SDA"  LOC = G3  |IOSTANDARD = LVCMOS33;
+NET "UartTxd"  LOC = G3  |IOSTANDARD = LVCMOS33;
 
 NET "VGA_R[7]" LOC = D9  |IOSTANDARD = LVCMOS18;    # R9
 NET "VGA_R[6]" LOC = E9  |IOSTANDARD = LVCMOS18;    # R8

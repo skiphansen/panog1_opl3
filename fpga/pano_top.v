@@ -57,7 +57,8 @@ module pano_top(
     output wire VGA_HSYNC,
     output wire VGA_BLANK_B,
     inout  wire VGA_SCL,
-    inout  wire VGA_SDA,
+    // inout  wire VGA_SDA,
+    output wire UartTxd,    // aka VGA DDC SDA
     output wire [7:0] VGA_R,
     output wire [7:0] VGA_G,
     output wire [7:0] VGA_B,
@@ -344,7 +345,7 @@ module pano_top(
     // Memory Map
     // 03000000 - 03000100 GPIO          See description below
     // 03000100 - 03000100 UART          (4B)
-    // 03000400 - 03000fff OPL2/OPL3     (2K)
+    // 03000800 - 03000fff OPL2/OPL3     (2K)
     // 04000000 - 04080000 USB           (512KB)
     // 08000000 - 08000FFF Video RAM     (4KB)
     // 0C000000 - 0DFFFFFF LPDDR SDRAM   (32MB)
@@ -364,7 +365,7 @@ module pano_top(
     
     wire la_addr_in_gpio = (mem_la_addr >= 32'h03000000) && (mem_la_addr < 32'h03000100);
     wire la_addr_in_uart = (mem_la_addr == 32'h03000100);
-    wire la_addr_in_opl3 = (mem_la_addr >= 32'h03000400) && (mem_la_addr < 32'h03001000);
+    wire la_addr_in_opl3 = (mem_la_addr >= 32'h03000800) && (mem_la_addr < 32'h03001000);
     wire la_addr_in_usb = (mem_la_addr >= 32'h04000000) && (mem_la_addr < 32'h04080000);
     wire la_addr_in_vram = (mem_la_addr >= 32'h08000000) && (mem_la_addr < 32'h08004000);
     wire la_addr_in_ddr = (mem_la_addr >= 32'h0C000000) && (mem_la_addr < 32'h0E000000);
@@ -527,7 +528,7 @@ module pano_top(
         .wstrb(uart_valid),
         .ready(uart_ready),
         .dat(mem_wdata[7:0]),
-        .txd(LED_BLUE)
+        .txd(UartTxd)
     );
 
 
@@ -607,7 +608,7 @@ module pano_top(
                     4'd6: gpio_rdata <= {31'd0, spi_di};
                     4'd8: gpio_rdata <= {31'd0, AUDIO_SCL};
                     4'd9: gpio_rdata <= {31'd0, AUDIO_SDA};
-                    4'hb: gpio_rdata <= {31'd0, VGA_SDA};
+                    // 4'hb: gpio_rdata <= {31'd0, VGA_SDA};
                     4'hc: gpio_rdata <= {30'd0, opl3_data_ovfl, opl3_data_rdy};
                 endcase
              end
@@ -679,7 +680,7 @@ module pano_top(
     assign VGA_VSYNC = vga_vs;
     assign VGA_HSYNC = vga_hs;
     
-    assign VGA_SDA = 1'bz;
+    // assign VGA_SDA = 1'bz;
     //assign VGA_SCL = 1'bz;
     
     wire vram_wea = (vram_valid && (mem_wstrb != 0)) ? 1'b1 : 1'b0;
@@ -700,7 +701,7 @@ module pano_top(
     wire signed [18:0] left_pre, right_pre;
     wire signed [15:0] left, right;
 
-`ifdef OPL3
+`ifdef BLOTTO
     assign left_pre = opl2_channel_a + opl2_channel_c;
     assign right_pre = opl2_channel_b + opl2_channel_d;
 `else
@@ -740,7 +741,7 @@ module pano_top(
     
     // ----------------------------------------------------------------------
     // LED 
-//    assign LED_BLUE = !led_blue;
+    assign LED_BLUE = !led_blue;
     assign LED_RED = !led_red;
     assign LED_GREEN = !led_green;
     

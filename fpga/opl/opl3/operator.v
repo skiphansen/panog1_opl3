@@ -200,7 +200,9 @@ module operator (
      * chance to propagate through
      */
     always @(posedge clk)
-        if (latch_feedback_pulse) begin
+        if(reset) 
+            feedback1[bank_num][op_num] <= 0;
+        else if (latch_feedback_pulse) begin
             feedback1[bank_num][op_num] <= out;
             feedback2[bank_num][op_num] <= feedback1[bank_num][op_num];
         end
