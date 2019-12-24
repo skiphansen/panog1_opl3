@@ -7,9 +7,13 @@ If you don't know what a Panologic thin client is please see [here](https://hack
 and [here](https://github.com/skiphansen/pano_hello_g1) for background.
 
 Magnus of Saanlima Electronics translated Greg Taylor's System Verilog HDL to 
-legacy Verilog because ISE for the Spartan 6 doesn't support System Verilog. 
-Since Magnus's interest was in running Doom he only ported the OPL2 subset 
-needed by Doom.
+legacy Verilog because Xilinx's ISE doesn't support System Verilog. This is
+important for designs based on the Spartan 3 or Spartan 6 FPGAs such as the 
+Panologic devices.
+
+Magnus's was interested in running Doom on an Spartan 6 LX9 and he found that
+the full OPL3 didn't fit so he also also created a OPL2 subset which all that
+is used by Doom anyway.
 
 I made further modifications to the core OPL code to correct errors encountered 
 when using the Spartan 3 version of ISE.  I also and created an interface to 
@@ -23,6 +27,9 @@ a RISC-V core, VGA and other glue logic).
 
 The eventual plan is to use this core on other projects to do more interesting
 things.
+
+Note: See this [project](https://github.com/skiphansen/panog2_opl3) for the 
+second generation Pano.
 
 ## Status
 The project builds and the Doom test files play.  It is suspected that the 
